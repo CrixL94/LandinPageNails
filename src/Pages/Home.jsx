@@ -3,8 +3,12 @@ import imgFondo from "../assets/images/nailshome.jpg";
 
 const Home = () => {
   return (
-    <section className="flex flex-col md:flex-row items-center justify-center min-h-screen max-w-7xl mx-auto p-6 md:p-12 gap-8 md:gap-20">
-      <div className="flex-1 text-center md:text-left">
+    <section className="flex flex-col w-full h-screen">
+        <div className="flex-1">
+
+
+        </div>
+      {/* <div className="flex-1 text-center md:text-left">
         <h1 className="text-4xl md:text-5xl font-serif font-semibold text-gray-800 leading-tight">
           Best Nails For <br /> Best Moments
         </h1>
@@ -22,7 +26,7 @@ const Home = () => {
           alt="Manos con uñas decoradas"
           className="rounded-lg shadow-lg object-cover w-full"
         />
-      </div>
+      </div> */}
     </section>
   );
 };
