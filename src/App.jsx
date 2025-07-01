@@ -1,12 +1,13 @@
-import './index.css';
+import { PrimeReactProvider } from 'primereact/api';
+import AppRouter from './Router/AppRouter';
 
 function App() {
 
   return (
     <>
-      <div>
-        <h1>HOLA</h1>
-      </div>
+    <PrimeReactProvider>
+      <AppRouter/>
+    </PrimeReactProvider>
     </>
   )
 }
