@@ -20,7 +20,7 @@ const Navbar = () => {
     <header className="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
-          <h1 className="text-xl font-bold text-pink-600">Nail`s Art Suray</h1>
+          <h1 className="text-xl font-bold text-purple-600">Nail`s Art Suray</h1>
 
           {/* Menú desktop */}
           <nav className="hidden md:flex gap-6">
@@ -30,8 +30,8 @@ const Navbar = () => {
                 to={link.path}
                 onClick={() => setOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center gap-2 px-2 py-1 text-gray-700 hover:text-pink-600 transition ${
-                    isActive ? "font-semibold text-pink-600" : ""
+                  `flex items-center gap-2 px-2 py-1 text-gray-700 hover:text-purple-600 transition ${
+                    isActive ? "font-semibold text-purple-600" : ""
                   }`
                 }
               >
@@ -58,8 +58,8 @@ const Navbar = () => {
                 to={link.path}
                 onClick={() => setOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center gap-2 px-2 py-1 text-gray-700 hover:text-pink-600 transition ${
-                    isActive ? "font-semibold text-pink-600" : ""
+                  `flex items-center gap-2 px-2 py-1 text-gray-700 hover:text-purple-600 transition ${
+                    isActive ? "font-semibold text-purple-600" : ""
                   }`
                 }
                 >
