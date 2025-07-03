@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 import { HashLoader } from "react-spinners";
 import { listarUrlsPublicas } from "../Services/Funciones";
+import AboutUs from "./AboutUs";
 
 const Home = () => {
   const [inicioData, setInicioData] = useState([]);
@@ -64,35 +65,39 @@ const Home = () => {
   }
 
   return (
-    <section className="flex flex-col md:flex-row items-center justify-center min-h-screen sm:px-[15rem] sm:mb-0 mb-4">
-      <div className="flex-1 text-center md:text-left sm:p-8 p-4">
-        <h1 className="text-2xl sm:text-6xl font-bold text-purple-600 sm:mb-4 sm:mt-0 mt-[7rem]">
-          {dataInicio?.titulo}
-        </h1>
+    <>
+      <section className="flex flex-col md:flex-row items-center justify-center min-h-screen sm:px-[15rem] sm:mb-0 mb-4">
+        <div className="flex-1 text-center md:text-left sm:p-8 p-4">
+          <h1 className="text-2xl sm:text-6xl font-bold text-purple-600 sm:mb-4 sm:mt-0 mt-[7rem]">
+            {dataInicio?.titulo}
+          </h1>
 
-        <p className="sm:text-2xl text-base md:text-lg text-gray-600 mb-6">
-          <span className="font-semibold sm:text-lg text-base text-purple-500">
-            {dataInicio?.subtitulo}
-          </span>
-          <span> </span>
-          {dataInicio?.resumen}
-          <br className="hidden sm:block" />
-          <span className="font-semibold">{dataInicio?.label_atencion}</span>
-        </p>
+          <p className="sm:text-2xl text-base md:text-lg text-gray-600 mb-6">
+            <span className="font-semibold sm:text-lg text-base text-purple-500">
+              {dataInicio?.subtitulo}
+            </span>
+            <span> </span>
+            {dataInicio?.resumen}
+            <br className="hidden sm:block" />
+            <span className="font-semibold">{dataInicio?.label_atencion}</span>
+          </p>
 
-        <button className="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-6 rounded-full transition duration-300">
-          {dataInicio?.label_boton}
-        </button>
-      </div>
+          <button className="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-6 rounded-full transition duration-300">
+            {dataInicio?.label_boton}
+          </button>
+        </div>
 
-      <div className="flex-1">
-        <img
-          src={`${imagenFondo?.url}`}
-          alt="Manicura y Pedicura"
-          className="w-full h-full object-cover sm:rounded-xl shadow-lg"
-        />
-      </div>
-    </section>
+        <div className="flex-1">
+          <img
+            src={`${imagenFondo?.url}`}
+            alt="Manicura y Pedicura"
+            className="w-full h-full object-cover sm:rounded-xl shadow-lg"
+          />
+        </div>
+      </section>
+
+      <AboutUs/>
+    </>
   );
 };
 
