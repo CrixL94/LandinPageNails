@@ -1,15 +1,101 @@
+import { useEffect, useState } from "react";
 import { Card } from "primereact/card";
 import { Divider } from "primereact/divider";
 import fondo from "../assets/fondo.jpg";
+import { supabase } from "../supabaseClient";
+import { HashLoader } from "react-spinners";
+import { listarUrlsPublicas } from "../Services/Funciones";
+import { motion, useAnimation } from "framer-motion";
 
 const AboutUs = () => {
+  const [inicioData, setInicioData] = useState([]);
+  const [testimoniosList, setTestimoniosList] = useState([]);
+  const [filesData, setFilesData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchInicioData = async () => {
+    setLoading(true);
+
+    const { data, error } = await supabase.from("about_us").select("*");
+
+    if (error) {
+      setInicioData([]);
+      setFilesData([]);
+      setLoading(false);
+      return;
+    }
+
+    if (!data) {
+      setInicioData([]);
+      setFilesData([]);
+      setLoading(false);
+      return;
+    }
+    setInicioData(data);
+
+    const nombresDeArchivo = data
+      .flatMap((item) => [item.imagen_url])
+      .filter(Boolean);
+
+    const urls = await listarUrlsPublicas("imagenes", "About_Us");
+
+    const urlsFiltradas = urls
+      .filter((url) => nombresDeArchivo.some((nombre) => url.includes(nombre)))
+      .map((url) => {
+        const nombre = url.split("/").pop();
+        return { nombre, url };
+      });
+
+    const { data: testimonios } = await supabase
+      .from("testimonios")
+      .select("*");
+    setTestimoniosList(testimonios);
+
+    setFilesData(urlsFiltradas);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchInicioData();
+  }, []);
+
+  const controls = useAnimation();
+  useEffect(() => {
+    let current = 0;
+
+    const interval = setInterval(() => {
+      const total = testimoniosList.length;
+      current = (current + 1) % total;
+      controls.start({
+        x: `-${current * 100}%`,
+        transition: { duration: 0.8, ease: "easeInOut" },
+      });
+    }, 4000); // cada 4 segundos
+
+    return () => clearInterval(interval);
+  }, [testimoniosList, controls]);
+  const imagenFondo = filesData.find(
+    (img) => img.nombre === inicioData[0].imagen_url
+  );
+
+  const dataInicio = inicioData[0];
+
   const imagenesHistoria = [fondo, fondo, fondo];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <HashLoader color="#9810fa" size={50} />
+      </div>
+    );
+  }
+
   return (
     <section className="sm:px-[15rem] mb-4 text-gray-800">
       <div className="min-h-screen flex flex-col md:flex-row items-center justify-center sm:mt-0 mt-[7rem]">
         <div className="flex-1">
           <img
-            src={`${fondo}`}
+            src={`${imagenFondo?.url}`}
             alt="Manicura y Pedicura"
             className="w-full h-full object-cover sm:rounded-xl shadow-lg"
           />
@@ -17,19 +103,15 @@ const AboutUs = () => {
 
         <div className="flex-1 text-center md:text-left sm:p-8 p-4">
           <h1 className="text-2xl sm:text-6xl font-bold text-purple-600 sm:mb-4">
-            Sobre Nosotros
+            {dataInicio?.titulo}
           </h1>
 
           <p className="sm:text-2xl text-base md:text-lg text-gray-600 mb-6">
             <span className="font-semibold sm:text-lg text-base text-purple-500">
-              Nails Art Suray
+              {dataInicio?.subtitulo}
             </span>
             <span> </span>
-            nació del sueño de crear un espacio donde la belleza, el cuidado
-            personal y el arte se unieran en una experiencia única. Desde
-            nuestros inicios en San Pedro Sula, hemos trabajado con dedicación
-            para ofrecer un servicio profesional y personalizado que realce la
-            belleza natural de cada clienta.
+            {dataInicio?.descripcion}
             <br className="hidden sm:block" />
           </p>
         </div>
@@ -39,20 +121,12 @@ const AboutUs = () => {
       <div className="grid md:grid-cols-2 gap-8 mb-12">
         <Card>
           <h3 className="text-xl font-semibold mb-2 text-purple-500">Misión</h3>
-          <p>
-            Brindar servicios de manicure y pedicure con altos estándares de
-            calidad, higiene y estilo, en un ambiente cómodo, relajante y
-            acogedor.
-          </p>
+          <p>{dataInicio?.mision}</p>
         </Card>
 
         <Card>
           <h3 className="text-xl font-semibold mb-2 text-purple-500">Visión</h3>
-          <p>
-            Ser el salón de belleza de referencia en la zona, reconocido por
-            nuestra creatividad, atención al detalle y compromiso con el
-            bienestar de nuestras clientas.
-          </p>
+          <p>{dataInicio?.vision}</p>
         </Card>
       </div>
 
@@ -119,7 +193,7 @@ const AboutUs = () => {
       <Divider />
 
       {/* Equipo */}
-      <Card className="mb-12">
+      {/* <Card className="mb-12">
         <h3 className="text-xl font-semibold mb-4 text-purple-500">
           Nuestro Equipo
         </h3>
@@ -143,29 +217,34 @@ const AboutUs = () => {
             <p className="text-sm text-gray-600">Diseño artístico y 3D</p>
           </div>
         </div>
-      </Card>
+      </Card> */}
 
-      <Divider />
+      {/* <Divider /> */}
 
       {/* Testimonios */}
       <Card className="mb-12">
         <h3 className="text-xl font-semibold mb-4 text-purple-500">
           Testimonios
-        </h3>
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-gray-100 p-4 rounded-lg shadow">
-            <p className="italic">
-              "Excelente atención y los diseños son hermosos. ¡Siempre salgo
-              feliz!"
-            </p>
-            <p className="font-semibold mt-2 text-right">– Ana M.</p>
-          </div>
-          <div className="bg-gray-100 p-4 rounded-lg shadow">
-            <p className="italic">
-              "Limpieza, puntualidad y creatividad. Mi lugar favorito sin duda."
-            </p>
-            <p className="font-semibold mt-2 text-right">– Karla R.</p>
-          </div>
+        </h3>{" "}
+        <div className="overflow-hidden w-full">
+          <motion.div
+            className="flex w-full"
+            animate={controls}
+            initial={{ x: "0%" }}
+          >
+            {testimoniosList.map((info, index) => (
+              <div key={index} className="min-w-full px-4">
+                <div className="bg-gray-100 p-6 rounded-lg shadow text-center max-w-xl mx-auto">
+                  <p className="italic text-lg text-gray-700">
+                    "{info?.contenido}"
+                  </p>
+                  <p className="font-semibold mt-4 text-purple-600 text-right">
+                    – {info?.nombre}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </motion.div>
         </div>
       </Card>
 
