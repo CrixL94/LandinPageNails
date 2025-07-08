@@ -218,13 +218,13 @@ const AboutUs = () => {
                 return (
                   <div
                     key={servicio.id}
-                    className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg hover:scale-105 transition-transform duration-300"
+                    className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer"
                   >
                     {imagen && (
                       <img
                         src={imagen.url}
                         alt={servicio.nombre}
-                        className="rounded-lg object-cover w-full shadow-md hover:scale-105 transition-transform duration-300"
+                        className="w-full object-cover rounded-md mb-3"
                       />
                     )}
                     <h4 className="text-lg font-semibold text-purple-600 mb-1">
