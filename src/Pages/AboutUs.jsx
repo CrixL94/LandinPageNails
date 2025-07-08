@@ -12,6 +12,9 @@ const AboutUs = () => {
   const [testimoniosList, setTestimoniosList] = useState([]);
   const [filesData, setFilesData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [dataServicios, setDataServicios] = useState([]);
+
+  const [filesDataServicios, setFilesDataServicios] = useState([]);
 
   const fetchInicioData = async () => {
     setLoading(true);
@@ -55,11 +58,40 @@ const AboutUs = () => {
     setLoading(false);
   };
 
+  const infoServicios = async () => {
+    setLoading(true);
+    const { data } = await supabase.from("servicios").select("*");
+
+    const serviciosFiltardos = (data || []).filter((estado) =>
+      [1].includes(estado.id_estado)
+    );
+
+    setDataServicios(serviciosFiltardos);
+
+    const nombresDeArchivo = data
+      .flatMap((item) => [item.imagen_url])
+      .filter(Boolean);
+
+    const urls = await listarUrlsPublicas("imagenes", "Servicios");
+
+    const urlsFiltradas = urls
+      .filter((url) => nombresDeArchivo.some((nombre) => url.includes(nombre)))
+      .map((url) => {
+        const nombre = url.split("/").pop();
+        return { nombre, url };
+      });
+
+    setFilesDataServicios(urlsFiltradas);
+    setLoading(false);
+  };
+
   useEffect(() => {
     fetchInicioData();
+    infoServicios();
   }, []);
 
   const controls = useAnimation();
+
   useEffect(() => {
     let current = 0;
 
@@ -74,6 +106,7 @@ const AboutUs = () => {
 
     return () => clearInterval(interval);
   }, [testimoniosList, controls]);
+
   const imagenFondo = filesData.find(
     (img) => img.nombre === inicioData[0].imagen_url
   );
@@ -177,14 +210,32 @@ const AboutUs = () => {
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {imagenesHistoria.map((src, index) => (
-                <img
-                  key={index}
-                  src={src}
-                  alt={`Historia ${index + 1}`}
-                  className="rounded-lg object-cover w-full shadow-md hover:scale-105 transition-transform duration-300"
-                />
-              ))}
+              {dataServicios.map((servicio, index) => {
+                const imagen = filesDataServicios.find(
+                  (img) => img.nombre === servicio.imagen_url
+                );
+
+                return (
+                  <div
+                    key={servicio.id}
+                    className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition duration-300"
+                  >
+                    {imagen && (
+                      <img
+                        src={imagen.url}
+                        alt={servicio.nombre}
+                        className="w-full object-cover rounded-md mb-3"
+                      />
+                    )}
+                    <h4 className="text-lg font-semibold text-purple-600 mb-1">
+                      {servicio.nombre}
+                    </h4>
+                    <p className="text-sm text-gray-600 mb-2">
+                      {servicio.descripcion}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
           </Card>
         </div>
