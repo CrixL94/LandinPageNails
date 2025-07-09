@@ -7,6 +7,8 @@ import { listarUrlsPublicas } from "../Services/Funciones";
 import ServiciosCard from "../Components/ServiciosCard";
 import TestimoniosCarousel from "../Components/TestimoniosCarousel";
 import BotonReservaCita from "../Components/BottonReservarCita";
+import { motion } from "framer-motion";
+import { slideInLeft } from "../Animations/Animations";
 
 const AboutUs = () => {
   const [inicioData, setInicioData] = useState([]);
@@ -69,100 +71,111 @@ const AboutUs = () => {
   }
 
   return (
-    <section className="sm:px-[15rem] mb-4 text-gray-800">
-      <div className="min-h-screen flex flex-col md:flex-row items-center justify-center sm:mt-0 mt-[7rem]">
-        <div className="flex-1">
-          <img
-            src={`${imagenFondo?.url}`}
-            alt="Manicura y Pedicura"
-            className="w-full h-full object-cover sm:rounded-xl shadow-lg"
-          />
+    <motion.div
+      className="flex-1 text-center md:text-left sm:p-8 p-4"
+      variants={slideInLeft}
+      initial="hidden"
+      whileInView="visible"
+      // viewport={{ once: true, amount: 0.1 }}
+    >
+      <section className="sm:px-[15rem] mb-4 text-gray-800">
+        <div className="min-h-screen flex flex-col md:flex-row items-center justify-center sm:mt-0 mt-[7rem]">
+          <div className="flex-1">
+            <img
+              src={`${imagenFondo?.url}`}
+              alt="Manicura y Pedicura"
+              className="w-full h-full object-cover sm:rounded-xl shadow-lg"
+            />
+          </div>
+
+          <div className="flex-1 text-center md:text-left sm:p-8 p-4">
+            <h1 className="text-2xl sm:text-6xl font-bold text-purple-600 sm:mb-4">
+              {dataInicio?.titulo}
+            </h1>
+
+            <p className="sm:text-2xl text-base md:text-lg text-gray-600 mb-6">
+              <span className="font-semibold sm:text-lg text-base text-purple-500">
+                {dataInicio?.subtitulo}
+              </span>
+              <span> </span>
+              {dataInicio?.descripcion}
+              <br className="hidden sm:block" />
+            </p>
+
+            <BotonReservaCita
+              textoAntes={"En "}
+              textoDespues={
+                ", cuidamos cada detalle para que salgas con una sonrisa y unas uñas que te encanten."
+              }
+              textoBoton={"Reserva tu cita"}
+            />
+          </div>
         </div>
 
-        <div className="flex-1 text-center md:text-left sm:p-8 p-4">
-          <h1 className="text-2xl sm:text-6xl font-bold text-purple-600 sm:mb-4">
-            {dataInicio?.titulo}
-          </h1>
+        {/* Mision Vision */}
+        <div className="grid md:grid-cols-2 gap-8 mb-12">
+          <Card>
+            <h3 className="text-xl font-semibold mb-2 text-purple-500">
+              Misión
+            </h3>
+            <p>{dataInicio?.mision}</p>
+          </Card>
 
-          <p className="sm:text-2xl text-base md:text-lg text-gray-600 mb-6">
-            <span className="font-semibold sm:text-lg text-base text-purple-500">
-              {dataInicio?.subtitulo}
-            </span>
-            <span> </span>
-            {dataInicio?.descripcion}
-            <br className="hidden sm:block" />
-          </p>
-
-          <BotonReservaCita
-            textoAntes={"En "}
-            textoDespues={
-              ", cuidamos cada detalle para que salgas con una sonrisa y unas uñas que te encanten."
-            }
-            textoBoton={"Reserva tu cita"}
-          />
+          <Card>
+            <h3 className="text-xl font-semibold mb-2 text-purple-500">
+              Visión
+            </h3>
+            <p>{dataInicio?.vision}</p>
+          </Card>
         </div>
-      </div>
 
-      {/* Mision Vision */}
-      <div className="grid md:grid-cols-2 gap-8 mb-12">
-        <Card>
-          <h3 className="text-xl font-semibold mb-2 text-purple-500">Misión</h3>
-          <p>{dataInicio?.mision}</p>
-        </Card>
+        <Divider />
 
-        <Card>
-          <h3 className="text-xl font-semibold mb-2 text-purple-500">Visión</h3>
-          <p>{dataInicio?.vision}</p>
-        </Card>
-      </div>
+        {/* Valores */}
+        <div className="mb-12 text-left">
+          <Card>
+            <h3 className="text-xl font-semibold mb-4 text-purple-500">
+              Nuestros Valores
+            </h3>
+            <ul className="list-disc list-inside space-y-1">
+              <li>✨ Profesionalismo</li>
+              <li>🎨 Creatividad</li>
+              <li>🧼 Higiene y seguridad</li>
+              <li>🌟 Atención personalizada</li>
+              <li>💡 Innovación constante</li>
+            </ul>
+          </Card>
+        </div>
 
-      <Divider />
+        <Divider />
 
-      {/* Valores */}
-      <div className="mb-12">
-        <Card>
-          <h3 className="text-xl font-semibold mb-4 text-purple-500">
-            Nuestros Valores
-          </h3>
-          <ul className="list-disc list-inside space-y-1">
-            <li>✨ Profesionalismo</li>
-            <li>🎨 Creatividad</li>
-            <li>🧼 Higiene y seguridad</li>
-            <li>🌟 Atención personalizada</li>
-            <li>💡 Innovación constante</li>
-          </ul>
-        </Card>
-      </div>
+        {/* Elegirnos */}
+        <div className="mb-16 text-left">
+          <Card>
+            <h3 className="text-xl font-semibold mb-4 text-purple-500">
+              ¿Por qué elegirnos?
+            </h3>
+            <ul className="list-disc list-inside space-y-1">
+              <li>Ambiente limpio, seguro y cómodo</li>
+              <li>Técnicas actualizadas y productos de alta calidad</li>
+              <li>Atención cálida y amigable</li>
+              <li>Citas puntuales y personalizadas</li>
+              <li>Más que un servicio, ¡una experiencia!</li>
+            </ul>
+          </Card>
+        </div>
 
-      <Divider />
+        <Divider />
 
-      {/* Elegirnos */}
-      <div className="mb-16">
-        <Card>
-          <h3 className="text-xl font-semibold mb-4 text-purple-500">
-            ¿Por qué elegirnos?
-          </h3>
-          <ul className="list-disc list-inside space-y-1">
-            <li>Ambiente limpio, seguro y cómodo</li>
-            <li>Técnicas actualizadas y productos de alta calidad</li>
-            <li>Atención cálida y amigable</li>
-            <li>Citas puntuales y personalizadas</li>
-            <li>Más que un servicio, ¡una experiencia!</li>
-          </ul>
-        </Card>
-      </div>
+        {/* Servicios */}
+        <div className="flex flex-col md:flex-row gap-8 mb-12 mt-5">
+          <ServiciosCard />
+        </div>
 
-      <Divider />
+        <Divider />
 
-      {/* Servicios */}
-      <div className="flex flex-col md:flex-row gap-8 mb-12 mt-5">
-        <ServiciosCard />
-      </div>
-
-      <Divider />
-
-      {/* Equipo */}
-      {/* <Card className="mb-12">
+        {/* Equipo */}
+        {/* <Card className="mb-12">
         <h3 className="text-xl font-semibold mb-4 text-purple-500">
           Nuestro Equipo
         </h3>
@@ -188,19 +201,20 @@ const AboutUs = () => {
         </div>
       </Card> */}
 
-      {/* <Divider /> */}
+        {/* <Divider /> */}
 
-      {/* Testimonios */}
-      <TestimoniosCarousel />
+        {/* Testimonios */}
+        <TestimoniosCarousel />
 
-      <div className="text-center">
-        <BotonReservaCita
-          textoAntes={"Vive la experiencia "}
-          textoDespues={", estilo, calidad y cuidado en cada detalle."}
-          textoBoton={"Reserva tu cita"}
-        />
-      </div>
-    </section>
+        <div className="text-center">
+          <BotonReservaCita
+            textoAntes={"Vive la experiencia "}
+            textoDespues={", estilo, calidad y cuidado en cada detalle."}
+            textoBoton={"Reserva tu cita"}
+          />
+        </div>
+      </section>
+    </motion.div>
   );
 };
 

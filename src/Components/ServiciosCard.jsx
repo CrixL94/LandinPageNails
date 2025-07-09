@@ -49,7 +49,7 @@ const ServiciosCard = () => {
             return (
               <div
                 key={servicio.id}
-                className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer"
+                className="bg-gray-100 rounded-lg shadow-md sm:p-4 p-2 hover:shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer"
               >
                 {imagen && (
                   <img

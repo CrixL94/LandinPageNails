@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 import { HashLoader } from "react-spinners";
+import { motion } from "framer-motion";
 import { listarUrlsPublicas } from "../Services/Funciones";
 import AboutUs from "./AboutUs";
+import { slideInRight } from "../Animations/Animations";
 
 const Home = () => {
   const [inicioData, setInicioData] = useState([]);
@@ -66,7 +68,13 @@ const Home = () => {
 
   return (
     <>
-      <section className="flex flex-col md:flex-row items-center justify-center min-h-screen sm:px-[15rem] sm:mb-0 mb-4">
+      <motion.div
+        variants={slideInRight}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        className="flex flex-col md:flex-row items-center justify-center min-h-screen sm:px-[15rem] sm:mb-0 mb-4"
+      >
         <div className="flex-1 text-center md:text-left sm:p-8 p-4">
           <h1 className="text-2xl sm:text-6xl font-bold text-purple-600 sm:mb-4 sm:mt-0 mt-[7rem]">
             {dataInicio?.titulo}
@@ -95,9 +103,8 @@ const Home = () => {
             className="w-full h-full object-cover sm:rounded-xl shadow-lg"
           />
         </div>
-      </section>
-
-      <AboutUs/>
+      </motion.div>
+      <AboutUs />
     </>
   );
 };
