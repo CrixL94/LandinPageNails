@@ -1,20 +1,17 @@
 import { useEffect, useState } from "react";
 import { Card } from "primereact/card";
 import { Divider } from "primereact/divider";
-import fondo from "../assets/fondo.jpg";
 import { supabase } from "../supabaseClient";
 import { HashLoader } from "react-spinners";
 import { listarUrlsPublicas } from "../Services/Funciones";
-import { motion, useAnimation } from "framer-motion";
+import ServiciosCard from "../Components/ServiciosCard";
+import TestimoniosCarousel from "../Components/TestimoniosCarousel";
+import BotonReservaCita from "../Components/BottonReservarCita";
 
 const AboutUs = () => {
   const [inicioData, setInicioData] = useState([]);
-  const [testimoniosList, setTestimoniosList] = useState([]);
   const [filesData, setFilesData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [dataServicios, setDataServicios] = useState([]);
-
-  const [filesDataServicios, setFilesDataServicios] = useState([]);
 
   const fetchInicioData = async () => {
     setLoading(true);
@@ -49,71 +46,19 @@ const AboutUs = () => {
         return { nombre, url };
       });
 
-    const { data: testimonios } = await supabase
-      .from("testimonios")
-      .select("*");
-    setTestimoniosList(testimonios);
-
     setFilesData(urlsFiltradas);
-    setLoading(false);
-  };
-
-  const infoServicios = async () => {
-    setLoading(true);
-    const { data } = await supabase.from("servicios").select("*");
-
-    const serviciosFiltardos = (data || []).filter((estado) =>
-      [1].includes(estado.id_estado)
-    );
-
-    setDataServicios(serviciosFiltardos);
-
-    const nombresDeArchivo = data
-      .flatMap((item) => [item.imagen_url])
-      .filter(Boolean);
-
-    const urls = await listarUrlsPublicas("imagenes", "Servicios");
-
-    const urlsFiltradas = urls
-      .filter((url) => nombresDeArchivo.some((nombre) => url.includes(nombre)))
-      .map((url) => {
-        const nombre = url.split("/").pop();
-        return { nombre, url };
-      });
-
-    setFilesDataServicios(urlsFiltradas);
     setLoading(false);
   };
 
   useEffect(() => {
     fetchInicioData();
-    infoServicios();
   }, []);
-
-  const controls = useAnimation();
-
-  useEffect(() => {
-    let current = 0;
-
-    const interval = setInterval(() => {
-      const total = testimoniosList.length;
-      current = (current + 1) % total;
-      controls.start({
-        x: `-${current * 100}%`,
-        transition: { duration: 0.8, ease: "easeInOut" },
-      });
-    }, 4000); // cada 4 segundos
-
-    return () => clearInterval(interval);
-  }, [testimoniosList, controls]);
 
   const imagenFondo = filesData.find(
     (img) => img.nombre === inicioData[0].imagen_url
   );
 
   const dataInicio = inicioData[0];
-
-  const imagenesHistoria = [fondo, fondo, fondo];
 
   if (loading) {
     return (
@@ -147,6 +92,14 @@ const AboutUs = () => {
             {dataInicio?.descripcion}
             <br className="hidden sm:block" />
           </p>
+
+          <BotonReservaCita
+            textoAntes={"En "}
+            textoDespues={
+              ", cuidamos cada detalle para que salgas con una sonrisa y unas uñas que te encanten."
+            }
+            textoBoton={"Reserva tu cita"}
+          />
         </div>
       </div>
 
@@ -203,42 +156,7 @@ const AboutUs = () => {
 
       {/* Servicios */}
       <div className="flex flex-col md:flex-row gap-8 mb-12 mt-5">
-        <div className="flex-1">
-          <Card className="shadow-lg">
-            <h3 className="text-xl font-semibold mb-3 text-purple-500">
-              Servicios
-            </h3>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {dataServicios.map((servicio, index) => {
-                const imagen = filesDataServicios.find(
-                  (img) => img.nombre === servicio.imagen_url
-                );
-
-                return (
-                  <div
-                    key={servicio.id}
-                    className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer"
-                  >
-                    {imagen && (
-                      <img
-                        src={imagen.url}
-                        alt={servicio.nombre}
-                        className="w-full object-cover rounded-md mb-3"
-                      />
-                    )}
-                    <h4 className="text-lg font-semibold text-purple-600 mb-1">
-                      {servicio.nombre}
-                    </h4>
-                    <p className="text-sm text-gray-600 mb-2">
-                      {servicio.descripcion}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-          </Card>
-        </div>
+        <ServiciosCard />
       </div>
 
       <Divider />
@@ -273,41 +191,14 @@ const AboutUs = () => {
       {/* <Divider /> */}
 
       {/* Testimonios */}
-      <Card className="mb-12">
-        <h3 className="text-xl font-semibold mb-4 text-purple-500">
-          Testimonios
-        </h3>{" "}
-        <div className="overflow-hidden w-full">
-          <motion.div
-            className="flex w-full"
-            animate={controls}
-            initial={{ x: "0%" }}
-          >
-            {testimoniosList.map((info, index) => (
-              <div key={index} className="min-w-full px-4">
-                <div className="bg-gray-100 p-6 rounded-lg shadow text-center max-w-xl mx-auto">
-                  <p className="italic text-lg text-gray-700">
-                    "{info?.contenido}"
-                  </p>
-                  <p className="font-semibold mt-4 text-purple-600 text-right">
-                    – {info?.nombre}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </motion.div>
-        </div>
-      </Card>
+      <TestimoniosCarousel />
 
       <div className="text-center">
-        <p className="text-lg font-semibold mb-4">
-          En <span className="text-purple-600">Nails Art Suray</span>, cuidamos
-          cada detalle para que salgas con una sonrisa y unas uñas que te
-          encanten.
-        </p>
-        <button className="bg-purple-600 hover:bg-purple-700 text-white py-3 px-8 rounded-full transition duration-300 text-lg">
-          Reserva tu cita
-        </button>
+        <BotonReservaCita
+          textoAntes={"Vive la experiencia "}
+          textoDespues={", estilo, calidad y cuidado en cada detalle."}
+          textoBoton={"Reserva tu cita"}
+        />
       </div>
     </section>
   );
