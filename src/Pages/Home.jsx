@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { listarUrlsPublicas } from "../Services/Funciones";
 import AboutUs from "./AboutUs";
 import { slideInRight } from "../Animations/Animations";
+import BotonReservaCita from "../Components/BottonReservarCita";
+import Contacto from "./Contacto";
 
 const Home = () => {
   const [inicioData, setInicioData] = useState([]);
@@ -86,14 +88,15 @@ const Home = () => {
             </span>
             <span> </span>
             {dataInicio?.resumen}
-            <br className="hidden sm:block" />
-            <span className="font-semibold">{dataInicio?.label_atencion}</span>
           </p>
 
-          <button className="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-6 rounded-full transition duration-300">
-            <i className="pi pi-calendar mr-2" />
-            {dataInicio?.label_boton}
-          </button>
+          <BotonReservaCita
+            textoAntes={""}
+            textoDespues={
+              ", transforma tu estilo con diseños únicos, colores vibrantes y el cuidado que te mereces."
+            }
+            textoBoton={"Reserva tu cita"}
+          />
         </div>
 
         <div className="flex-1">
@@ -105,6 +108,7 @@ const Home = () => {
         </div>
       </motion.div>
       <AboutUs />
+      <Contacto />
     </>
   );
 };

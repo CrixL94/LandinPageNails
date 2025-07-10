@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Card } from "primereact/card";
 import { motion, useAnimation } from "framer-motion";
 import { supabase } from "../supabaseClient";
+import BotonReservaCita from "./BottonReservarCita";
 
 const TestimoniosCarousel = () => {
   const [testimoniosList, setTestimoniosList] = useState([]);
@@ -61,6 +62,15 @@ const TestimoniosCarousel = () => {
             </div>
           ))}
         </motion.div>
+
+        <div className="flex justify-end">
+          <BotonReservaCita
+            textoAntes={""}
+            textoDespues={""}
+            marca={""}
+            textoBoton={"Reserva tu cita"}
+          />
+        </div>
       </div>
     </Card>
   );

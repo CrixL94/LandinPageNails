@@ -1,7 +1,7 @@
 const BotonReservaCita = ({
   textoAntes,
   textoDespues,
-  marca = "Nails Art Suray",
+  marca = "Nail`s Art Suray",
   textoBoton,
 }) => {
   return (

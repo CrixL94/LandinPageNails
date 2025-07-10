@@ -205,14 +205,6 @@ const AboutUs = () => {
 
         {/* Testimonios */}
         <TestimoniosCarousel />
-
-        <div className="text-center">
-          <BotonReservaCita
-            textoAntes={"Vive la experiencia "}
-            textoDespues={", estilo, calidad y cuidado en cada detalle."}
-            textoBoton={"Reserva tu cita"}
-          />
-        </div>
       </section>
     </motion.div>
   );

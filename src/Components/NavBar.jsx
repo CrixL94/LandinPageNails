@@ -10,8 +10,8 @@ const Navbar = () => {
     { name: "Inicio", path: "/", icon: "pi pi-home" },
     { name: "Sobre Nosotros", path: "/aboutUs", icon: "pi pi-user" },
     { name: "Servicios", path: "/servicios", icon: "pi pi-cog" },
-    { name: "Galería", path: "/galeria", icon: "pi pi-images" },
     { name: "Contacto", path: "/contacto", icon: "pi pi-envelope" },
+    { name: "Galería", path: "/galeria", icon: "pi pi-images" },
   ];
 
   const toggleMenu = () => setOpen(!open);

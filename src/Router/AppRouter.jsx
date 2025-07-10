@@ -4,6 +4,7 @@ import Home from "../Pages/Home";
 import AboutUs from "../Pages/AboutUs";
 import ScrollToTop from "../Components/ScrollToTop";
 import Servicios from "../Pages/Servicios";
+import Contacto from "../Pages/Contacto";
 
 const AppRouter = () => {
   return (
@@ -15,6 +16,7 @@ const AppRouter = () => {
           <Route path="home" element={<Home />} />
           <Route path="aboutUs" element={<AboutUs />} />
           <Route path="servicios" element={<Servicios />} />
+          <Route path="contacto" element={<Contacto />} />
         </Route>
       </Routes>
     </BrowserRouter>
