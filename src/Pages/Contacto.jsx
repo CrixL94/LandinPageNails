@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import contactImg from "../assets/reservar.webp";
 import { motion } from "framer-motion";
 import { slideInRight } from "../Animations/Animations";
@@ -8,9 +8,11 @@ import { InputMask } from "primereact/InputMask";
 import { supabase } from "../supabaseClient";
 import Swal from "sweetalert2";
 import SocialIcons from "../Components/SocialIcons";
+import MapView from "../Components/Mapa";
+import { HashLoader } from "react-spinners";
 
 const Contacto = () => {
-  const nombreRef = useRef(null);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     nombre: "",
     celular: "",
@@ -23,6 +25,7 @@ const Contacto = () => {
   };
 
   const handleSubmit = async (e) => {
+    setLoading(true);
     e.preventDefault();
 
     const { nombre, celular, email, mensaje } = formData;
@@ -66,14 +69,9 @@ const Contacto = () => {
         timer: 3000,
       });
       setFormData({ nombre: "", celular: "", email: "", mensaje: "" });
+      setLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (nombreRef.current) {
-      nombreRef.current.focus();
-    }
-  }, []);
 
   return (
     <motion.div variants={slideInRight} initial="hidden" animate="visible">
@@ -152,18 +150,37 @@ const Contacto = () => {
 
               <button
                 type="submit"
+                disabled={loading}
+                className={`bg-purple-600 hover:bg-purple-700 text-white py-3 px-8 rounded-full transition duration-300 text-lg w-full mb-2 flex items-center justify-center cursor-pointer ${
+                  loading ? "opacity-70 cursor-not-allowed" : ""
+                }`}
+              >
+                {loading ? (
+                  <>
+                    <HashLoader color="white" size={22} />
+                  </>
+                ) : (
+                  <>
+                    <i className="pi pi-send mr-2"></i>
+                    Enviar mensaje
+                  </>
+                )}
+              </button>
+
+              {/* <button
+                type="submit"
                 className="bg-purple-600 hover:bg-purple-700 text-white py-3 px-8 rounded-full transition duration-300 text-lg w-full mb-2"
               >
-                <i className="pi pi-calendar mr-2" />
+                <i className="pi pi-send mr-2" />
                 Enviar mensaje
-              </button>
+              </button> */}
             </form>
 
             <div className="mt-8">
               <p className="text-gray-500 font-semibold mb-2">
                 Síguenos en nuestras redes:
               </p>
-              <SocialIcons/>
+              <SocialIcons />
             </div>
           </div>
 
@@ -174,6 +191,10 @@ const Contacto = () => {
               className="w-full h-full object-cover sm:rounded-xl shadow-lg"
             />
           </div>
+        </div>
+
+        <div>
+          <MapView />
         </div>
       </section>
     </motion.div>
