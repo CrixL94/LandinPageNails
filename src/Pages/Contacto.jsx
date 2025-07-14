@@ -166,21 +166,26 @@ const Contacto = () => {
                   </>
                 )}
               </button>
-
-              {/* <button
-                type="submit"
-                className="bg-purple-600 hover:bg-purple-700 text-white py-3 px-8 rounded-full transition duration-300 text-lg w-full mb-2"
-              >
-                <i className="pi pi-send mr-2" />
-                Enviar mensaje
-              </button> */}
             </form>
 
-            <div className="mt-8">
-              <p className="text-gray-500 font-semibold mb-2">
-                Síguenos en nuestras redes:
-              </p>
-              <SocialIcons />
+            <div className="mt-8 text-left text-sm text-gray-600 grid grid-cols-1 sm:grid-cols-3 gap-8">
+              <div>
+                <p className="text-gray-500 font-semibold mb-2">
+                  Síguenos en nuestras redes:
+                </p>
+                <SocialIcons />
+              </div>
+              <div>
+                <p className="mb-1 font-semibold">📍 Dirección:</p>
+                <p>Residencial Green Valley</p>
+              </div>
+              <div>
+                <p className="mb-1 font-semibold">🕒 Horario de atención:</p>
+                <p>Lunes a Sábado</p>
+                <p className="text-gray-500">
+                  * Atendemos únicamente con cita previa
+                </p>
+              </div>
             </div>
           </div>
 
