@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 import { InputMask } from "primereact/InputMask";
 import { Dropdown } from "primereact/dropdown";
 import { generarHoras } from "../Services/Funciones";
+import SocialIcons from "./SocialIcons";
 
 const BotonReservaCita = ({
   textoAntes,
@@ -120,12 +121,14 @@ const BotonReservaCita = ({
     setFormData({
       nombre: "",
       celular: "",
+      iddetalleservicio: null,
       fecha: null,
       hora: "",
     });
     setErrors({
       nombre: false,
       celular: false,
+      iddetalleservicio: false,
       fecha: false,
       hora: false,
     });
@@ -290,6 +293,13 @@ const BotonReservaCita = ({
             )}
           </button>
         </form>
+
+        <div className="flex sm:justify-end justify-center mt-5">
+          <p className="text-gray-500 font-semibold">
+            Síguenos en nuestras redes
+            <SocialIcons />
+          </p>
+        </div>
       </Dialog>
     </div>
   );

@@ -38,6 +38,7 @@ const Contacto = () => {
         confirmButtonText: "Entendido",
         confirmButtonColor: "#8B5CF6",
       });
+      setLoading(false);
       return;
     }
 
