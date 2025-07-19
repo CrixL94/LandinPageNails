@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { Card } from "primereact/card";
 import { supabase } from "../supabaseClient";
 import { listarUrlsPublicas } from "../Services/Funciones";
+import { useNavigate } from "react-router-dom";
 
 const ServiciosCard = () => {
+  const navigate = useNavigate(); 
   const [dataServicios, setDataServicios] = useState([]);
   const [filesDataServicios, setFilesDataServicios] = useState([]);
 
@@ -49,6 +51,7 @@ const ServiciosCard = () => {
             return (
               <div
                 key={servicio.id}
+                onClick={() => navigate("/servicios")}
                 className="bg-gray-100 rounded-lg shadow-md sm:p-4 p-2 hover:shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer"
               >
                 {imagen && (
