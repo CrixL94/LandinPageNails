@@ -1,1 +1,23 @@
 @import "tailwindcss";
+
+.p-calendar .p-datepicker-trigger {
+  @apply bg-purple-600; /* fondo púrpura */
+  border-color: #7c3aed; /* opcional: para que coincida con rounded-md */
+  /* puedes agregar padding si quieres ajustar tamaño */
+}
+
+/* Cambiar el fondo al pasar el mouse */
+.p-calendar .p-datepicker-trigger:hover {
+  @apply bg-purple-700;
+}
+
+.p-inputtext:focus,
+.p-inputwrapper-focus,
+.p-dropdown .p-inputtext:focus,
+.p-inputmask:focus {
+  @apply border-purple-600 ring-1 ring-purple-600;
+}
+
+.p-calendar.p-focus > .p-inputtext {
+  @apply border-purple-600 ring-1 ring-purple-600;
+}

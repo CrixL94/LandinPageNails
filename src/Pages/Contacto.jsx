@@ -4,12 +4,12 @@ import { motion } from "framer-motion";
 import { slideInRight } from "../Animations/Animations";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
-import { InputMask } from "primereact/InputMask";
 import { supabase } from "../supabaseClient";
 import Swal from "sweetalert2";
 import SocialIcons from "../Components/SocialIcons";
 import MapView from "../Components/Mapa";
 import { HashLoader } from "react-spinners";
+import { InputMask } from "primereact/InputMask";
 
 const Contacto = () => {
   const [loading, setLoading] = useState(false);

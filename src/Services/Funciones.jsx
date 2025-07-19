@@ -53,3 +53,26 @@ export async function listarUrlsPublicas(bucket, folder, limit = 100, offset = 0
 
   return urls;
 }
+
+
+export const generarHoras = () => {
+  const horas = [];
+  const start = 8 * 60; // 8:00 AM en minutos
+  const end = 19 * 60;  // 7:00 PM en minutos
+
+  for (let minutos = start; minutos <= end; minutos += 30) {
+    const h = Math.floor(minutos / 60);
+    const m = minutos % 60;
+    const hora24 = `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
+
+    // Convertir a AM/PM
+    const ampm = h >= 12 ? "PM" : "AM";
+    const h12 = h % 12 === 0 ? 12 : h % 12;
+    const hora12 = `${h12}:${m.toString().padStart(2, "0")} ${ampm}`;
+
+    horas.push({ label: hora12, value: hora24 }); // label visible, value en formato 24h
+  }
+
+  return horas;
+};
+
