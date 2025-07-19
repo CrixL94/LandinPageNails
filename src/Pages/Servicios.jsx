@@ -98,7 +98,8 @@ const Servicios = () => {
                         }`}
                       >
                         <h4 className="text-lg font-semibold text-purple-600">
-                          {detalle.nombre} - L. {detalle.precio}
+                          {detalle.nombre}
+                          {/* - L. {detalle.precio} */}
                         </h4>
                         <p className="text-gray-700">{detalle.descripcion}</p>
                       </div>
@@ -149,7 +150,8 @@ const Servicios = () => {
                         }`}
                       >
                         <h4 className="text-lg font-semibold text-purple-600">
-                          {detalle.nombre} - L. {detalle.precio}
+                          {detalle.nombre}
+                          {/* - L. {detalle.precio} */}
                         </h4>
                         <p className="text-gray-700">{detalle.descripcion}</p>
                       </div>
@@ -170,7 +172,7 @@ const Servicios = () => {
         );
       })}
       <Divider />
-      <TestimoniosCarousel/>
+      <TestimoniosCarousel />
     </div>
   );
 };
