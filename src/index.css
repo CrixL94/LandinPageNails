@@ -1,13 +1,18 @@
 @import "tailwindcss";
 
-body {
-  overflow-x: hidden;
+* {
+  box-sizing: border-box;
 }
 
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+}
+
+
 .p-calendar .p-datepicker-trigger {
-  @apply bg-purple-600; /* fondo púrpura */
-  border-color: #7c3aed; /* opcional: para que coincida con rounded-md */
-  /* puedes agregar padding si quieres ajustar tamaño */
+  @apply bg-purple-600;
+  border-color: #7c3aed;
 }
 
 /* Cambiar el fondo al pasar el mouse */
