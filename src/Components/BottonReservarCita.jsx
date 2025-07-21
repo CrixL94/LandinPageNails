@@ -5,7 +5,7 @@ import { Calendar } from "primereact/calendar";
 import { supabase } from "../supabaseClient";
 import { HashLoader } from "react-spinners";
 import Swal from "sweetalert2";
-import { InputMask } from "primereact/InputMask";
+import { InputMask } from "primereact/inputMask";
 import { Dropdown } from "primereact/dropdown";
 import { generarHoras } from "../Services/Funciones";
 import SocialIcons from "./SocialIcons";

@@ -9,7 +9,7 @@ import Swal from "sweetalert2";
 import SocialIcons from "../Components/SocialIcons";
 import MapView from "../Components/Mapa";
 import { HashLoader } from "react-spinners";
-import { InputMask } from "primereact/InputMask";
+import { InputMask } from "primereact/inputMask";
 
 const Contacto = () => {
   const [loading, setLoading] = useState(false);
