@@ -7,6 +7,8 @@ import { Galleria } from "primereact/galleria";
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
+import BotonReservaCita from "../Components/BottonReservarCita";
+import SocialIcons from "../Components/SocialIcons";
 
 const Galeria = () => {
   const [imagenes, setImagenes] = useState([]);
@@ -58,6 +60,18 @@ const Galeria = () => {
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-purple-600 mb-10 text-center sm:mt-0 mt-[7rem]">
             Nuestra Galería
           </h1>
+          <p className="text-center sm:text-2xl text-base md:text-lg text-gray-700 font-bold">
+            ¡Transforma tus uñas en arte! Agenda tu cita hoy.
+          </p>
+          <div className="mb-6 justify-center">
+            <BotonReservaCita
+              textoAntes={""}
+              textoDespues={""}
+              textoBoton={"Reserva tu cita"}
+              marca=""
+            />
+            <SocialIcons/>
+          </div>
 
           {loading ? (
             <div className="flex justify-center items-center min-h-[30vh]">
@@ -65,7 +79,7 @@ const Galeria = () => {
             </div>
           ) : (
             <>
-              <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4">
+              <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4 p-1">
                 {imagenes.map((img, idx) => (
                   <motion.div
                     key={idx}
