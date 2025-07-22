@@ -92,9 +92,8 @@ const Home = () => {
 
           <BotonReservaCita
             textoAntes={""}
-            textoDespues={
-              ", transforma tu estilo con diseños únicos, colores vibrantes y el cuidado que te mereces."
-            }
+            textoDespues={""}
+            marca={""}
             textoBoton={"Reserva tu cita"}
           />
         </div>

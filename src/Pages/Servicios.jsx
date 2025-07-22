@@ -107,10 +107,9 @@ const Servicios = () => {
                   </div>
 
                   <BotonReservaCita
-                    textoAntes={"Vive la experiencia "}
-                    textoDespues={
-                      ", estilo, calidad y cuidado en cada detalle."
-                    }
+                    textoAntes={""}
+                    textoDespues={""}
+                    marca={""}
                     textoBoton={"Reserva tu cita"}
                   />
                 </div>
@@ -159,10 +158,9 @@ const Servicios = () => {
                   </div>
 
                   <BotonReservaCita
-                    textoAntes={"Vive la experiencia "}
-                    textoDespues={
-                      ", estilo, calidad y cuidado en cada detalle."
-                    }
+                    textoAntes={""}
+                    textoDespues={""}
+                    marca={""}
                     textoBoton={"Reserva tu cita"}
                   />
                 </div>

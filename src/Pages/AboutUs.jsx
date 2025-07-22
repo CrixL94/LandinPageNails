@@ -102,13 +102,12 @@ const AboutUs = () => {
               <br className="hidden sm:block" />
             </p>
 
-            <BotonReservaCita
-              textoAntes={"En "}
-              textoDespues={
-                ", cuidamos cada detalle para que salgas con una sonrisa y unas uñas que te encanten."
-              }
-              textoBoton={"Reserva tu cita"}
-            />
+          <BotonReservaCita
+            textoAntes={""}
+            textoDespues={""}
+            marca={""}
+            textoBoton={"Reserva tu cita"}
+          />
           </div>
         </div>
 
