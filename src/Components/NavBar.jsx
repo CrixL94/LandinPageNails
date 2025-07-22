@@ -1,7 +1,7 @@
-import { Divider } from "primereact/divider";
 import { Sidebar } from "primereact/sidebar";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
+import logo from "../assets/logo.png";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -21,7 +21,8 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <NavLink to="/" className="text-xl font-bold text-purple-600 hover:text-purple-800 transition">
-            Nail`s Art Suray
+            <img src={logo} alt="logo"  className="w-[5.8rem] mt-2"/>
+            {/* Nail`s Art Suray */}
           </NavLink>
 
           {/* Menú desktop */}
