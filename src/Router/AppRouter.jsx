@@ -6,6 +6,7 @@ import ScrollToTop from "../Components/ScrollToTop";
 import Servicios from "../Pages/Servicios";
 import Contacto from "../Pages/Contacto";
 import Galeria from "../Pages/Galeria";
+import Testimonios from "../Pages/Testimonios";
 
 const AppRouter = () => {
   return (
@@ -19,6 +20,7 @@ const AppRouter = () => {
           <Route path="servicios" element={<Servicios />} />
           <Route path="contacto" element={<Contacto />} />
           <Route path="galeria" element={<Galeria />} />
+          <Route path="testimonios" element={<Testimonios />} />
         </Route>
       </Routes>
     </BrowserRouter>
