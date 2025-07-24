@@ -192,7 +192,7 @@ const BotonReservaCita = ({
             <InputMask
               id="celular"
               name="celular"
-              mask="+999 9999-9999"
+              mask="+504 9999-9999"
               placeholder="+504 9999-9999"
               value={formData.celular}
               onChange={handleChange}
