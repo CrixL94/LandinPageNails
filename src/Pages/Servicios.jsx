@@ -101,7 +101,7 @@ const Servicios = () => {
                           {detalle.nombre}
                           {/* - L. {detalle.precio} */}
                         </h4>
-                        <p className="text-gray-700">{detalle.descripcion}</p>
+                        {/* <p className="text-gray-700">{detalle.descripcion}</p> */}
                       </div>
                     ))}
                   </div>
@@ -152,7 +152,7 @@ const Servicios = () => {
                           {detalle.nombre}
                           {/* - L. {detalle.precio} */}
                         </h4>
-                        <p className="text-gray-700">{detalle.descripcion}</p>
+                        {/* <p className="text-gray-700">{detalle.descripcion}</p> */}
                       </div>
                     ))}
                   </div>
