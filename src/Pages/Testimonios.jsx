@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { slideInRight } from "../Animations/Animations";
 import { InputText } from "primereact/inputtext";
@@ -7,10 +7,8 @@ import { InputMask } from "primereact/inputmask";
 import Swal from "sweetalert2";
 import { supabase } from "../supabaseClient";
 import img from "../assets/reservar.webp";
-import { useNavigate } from "react-router-dom";
 
 const Testimonios = () => {
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     nombre: "",
@@ -58,18 +56,21 @@ const Testimonios = () => {
     } else {
       Swal.fire({
         icon: "success",
-        title: "¡Gracias por tu opinión!",
-        text: "Tu testimonio ha sido enviado exitosamente.",
-        timer: 3000,
-        showConfirmButton: false,
+        title: "Experiencia enviada",
+        text: "Gracias por compartir tu experiencia con nosotros.",
+        confirmButtonText: "Cerrar",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = "/";
+        }
       });
-      setFormData({ nombre: "", Celular: "", contenido: "" });
-      setTimeout(() => {
-        navigate("/home");
-      }, 3000);
-    }
 
-    setLoading(false);
+      // Limpiar formulario y quitar loading
+      setFormData({ nombre: "", Celular: "", contenido: "" });
+      setLoading(false);
+    }
   };
 
   return (
