@@ -57,7 +57,7 @@ const Galeria = () => {
     <motion.div variants={slideInRight} initial="hidden" animate="visible">
       <section className="sm:px-[15rem] sm:mb-0 mb-4 text-gray-800">
         <div className="flex flex-col items-center justify-center min-h-screen">
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-purple-600 mb-10 text-center sm:mt-0 mt-[7rem]">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-purple-600 mb-10 text-center sm:mt-24 mt-[7rem]">
             Nuestra Galería
           </h1>
           <p className="text-center sm:text-2xl text-base md:text-lg text-gray-700 font-bold">
