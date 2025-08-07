@@ -115,6 +115,7 @@ const Testimonios = () => {
                   placeholder="+504 9999-9999"
                   value={formData?.Celular}
                   onChange={handleChange}
+                  type="tel"
                   className="w-full"
                 />
               </div>

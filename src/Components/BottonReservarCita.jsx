@@ -196,6 +196,7 @@ const BotonReservaCita = ({
               placeholder="+504 9999-9999"
               value={formData.celular}
               onChange={handleChange}
+              type="tel"
               className={`w-full`}
             />
             {errors.celular && (
