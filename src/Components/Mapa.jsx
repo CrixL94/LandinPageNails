@@ -1,7 +1,27 @@
+import { useEffect, useRef, useState } from "react";
 import { NEGOCIO, comoLlegarUrl } from "../Services/infoNegocio";
 
 const MapView = () => {
   const { lat, lng } = NEGOCIO.coordenadas;
+  const contenedorRef = useRef(null);
+  const [cargar, setCargar] = useState(false);
+
+  // El iframe de Google Maps pesa bastante: se crea solo al acercarse a la sección
+  useEffect(() => {
+    const el = contenedorRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setCargar(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "300px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div className="card-soft overflow-hidden">
@@ -21,7 +41,8 @@ const MapView = () => {
           Cómo llegar
         </a>
       </div>
-      <div className="h-[340px] w-full sm:h-[420px]">
+      <div ref={contenedorRef} className="h-[340px] w-full bg-sand sm:h-[420px]">
+        {cargar && (
         <iframe
           width="100%"
           height="100%"
@@ -32,6 +53,7 @@ const MapView = () => {
           referrerPolicy="no-referrer-when-downgrade"
           title="Mapa de ubicación"
         />
+        )}
       </div>
     </div>
   );

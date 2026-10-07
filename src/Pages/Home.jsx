@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import { motion } from "framer-motion";
-import { listarUrlsPublicas } from "../Services/Funciones";
+import { urlArchivo } from "../Services/Funciones";
 import AboutUs from "./AboutUs";
 import { fadeUp, stagger } from "../Animations/Animations";
 import BotonReservaCita from "../Components/BottonReservarCita";
@@ -16,37 +16,12 @@ const CONFIANZA = [
 ];
 
 const Home = () => {
-  const [inicioData, setInicioData] = useState([]);
-  const [filesData, setFilesData] = useState([]);
+  const [dataInicio, setDataInicio] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const fetchInicioData = async () => {
-    setLoading(true);
-
-    const { data, error } = await supabase.from("vta_inicio_web").select("*");
-
-    if (error || !data) {
-      setInicioData([]);
-      setFilesData([]);
-      setLoading(false);
-      return;
-    }
-    setInicioData(data);
-
-    const nombresDeArchivo = data
-      .flatMap((item) => [item.imagen_url_fondo])
-      .filter(Boolean);
-
-    const urls = await listarUrlsPublicas("imagenes", "inicio_web");
-
-    const urlsFiltradas = urls
-      .filter((url) => nombresDeArchivo.some((nombre) => url.includes(nombre)))
-      .map((url) => {
-        const nombre = url.split("/").pop();
-        return { nombre, url };
-      });
-
-    setFilesData(urlsFiltradas);
+    const { data } = await supabase.from("vta_inicio_web").select("*");
+    setDataInicio(data?.[0] ?? null);
     setLoading(false);
   };
 
@@ -54,13 +29,19 @@ const Home = () => {
     fetchInicioData();
   }, []);
 
-  const dataInicio = inicioData[0];
+  const imagenFondo = urlArchivo("imagenes", "inicio_web", dataInicio?.imagen_url_fondo);
 
-  const imagenFondo = filesData.find(
-    (img) => img.nombre === dataInicio?.imagen_url_fondo
-  );
-
-  if (loading) return <PageLoader />;
+  // Nosotros y Contacto se montan desde el inicio para que sus consultas
+  // corran en paralelo con la del hero
+  if (loading) {
+    return (
+      <>
+        <PageLoader />
+        <AboutUs embedded />
+        <Contacto embedded />
+      </>
+    );
+  }
 
   return (
     <>
@@ -132,7 +113,7 @@ const Home = () => {
             <div className="frame-arch relative aspect-[4/5] bg-brand-100 shadow-lift">
               {imagenFondo && (
                 <img
-                  src={imagenFondo.url}
+                  src={imagenFondo}
                   alt="Uñas acrílicas de Nail's Art Suray"
                   className="h-full w-full object-cover"
                   fetchPriority="high"

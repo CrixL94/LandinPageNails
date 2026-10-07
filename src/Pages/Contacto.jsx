@@ -4,7 +4,6 @@ import { fadeUp, stagger, viewportOnce } from "../Animations/Animations";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { supabase } from "../supabaseClient";
-import Swal from "sweetalert2";
 import SocialIcons from "../Components/SocialIcons";
 import MapView from "../Components/Mapa";
 import PageHeader from "../Components/PageHeader";
@@ -48,6 +47,8 @@ const Contacto = ({ embedded = false }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // SweetAlert se carga solo al enviar
+    const { default: Swal } = await import("sweetalert2");
 
     const { nombre, celular, email, mensaje } = formData;
 

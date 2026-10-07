@@ -6,7 +6,6 @@ import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { InputMask } from "primereact/inputmask";
 import { HashLoader } from "react-spinners";
-import Swal from "sweetalert2";
 import { supabase } from "../supabaseClient";
 import img from "../assets/reservar.webp";
 
@@ -23,6 +22,8 @@ const Testimonios = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // SweetAlert se carga solo al enviar
+    const { default: Swal } = await import("sweetalert2");
 
     const { nombre, Celular, contenido } = formData;
 

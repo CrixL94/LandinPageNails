@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
-import { listarUrlsPublicas } from "../Services/Funciones";
+import { urlArchivo } from "../Services/Funciones";
 import ServiciosCard from "../Components/ServiciosCard";
 import TestimoniosCarousel from "../Components/TestimoniosCarousel";
 import BotonReservaCita from "../Components/BottonReservarCita";
@@ -33,37 +33,12 @@ const RAZONES = [
 
 // `embedded`: se muestra dentro de Inicio, sin el espaciado superior de página
 const AboutUs = ({ embedded = false }) => {
-  const [inicioData, setInicioData] = useState([]);
-  const [filesData, setFilesData] = useState([]);
+  const [dataInicio, setDataInicio] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const fetchInicioData = async () => {
-    setLoading(true);
-
-    const { data, error } = await supabase.from("about_us").select("*");
-
-    if (error || !data) {
-      setInicioData([]);
-      setFilesData([]);
-      setLoading(false);
-      return;
-    }
-    setInicioData(data);
-
-    const nombresDeArchivo = data
-      .flatMap((item) => [item.imagen_url])
-      .filter(Boolean);
-
-    const urls = await listarUrlsPublicas("imagenes", "About_Us");
-
-    const urlsFiltradas = urls
-      .filter((url) => nombresDeArchivo.some((nombre) => url.includes(nombre)))
-      .map((url) => {
-        const nombre = url.split("/").pop();
-        return { nombre, url };
-      });
-
-    setFilesData(urlsFiltradas);
+    const { data } = await supabase.from("about_us").select("*");
+    setDataInicio(data?.[0] ?? null);
     setLoading(false);
   };
 
@@ -71,16 +46,14 @@ const AboutUs = ({ embedded = false }) => {
     fetchInicioData();
   }, []);
 
-  const dataInicio = inicioData[0];
-
-  const imagenFondo = filesData.find(
-    (img) => img.nombre === dataInicio?.imagen_url
-  );
-
-  if (loading) return embedded ? null : <PageLoader />;
+  const imagenFondo = urlArchivo("imagenes", "About_Us", dataInicio?.imagen_url);
 
   return (
     <>
+      {loading ? (
+        embedded ? null : <PageLoader />
+      ) : (
+      <>
       {/* Introducción */}
       <section
         className={`container-page grid items-center gap-14 md:grid-cols-2 md:gap-16 ${
@@ -97,7 +70,7 @@ const AboutUs = ({ embedded = false }) => {
           <div className="frame-arch aspect-[4/5] bg-brand-100 shadow-lift">
             {imagenFondo && (
               <img
-                src={imagenFondo.url}
+                src={imagenFondo}
                 alt="Nuestro estudio de uñas"
                 loading="lazy"
                 className="h-full w-full object-cover"
@@ -224,6 +197,10 @@ const AboutUs = ({ embedded = false }) => {
         </motion.div>
       </section>
 
+      </>
+      )}
+
+      {/* Servicios y testimonios cargan sus datos en paralelo */}
       <ServiciosCard />
       <div className="bg-sand">
         <TestimoniosCarousel />

@@ -1,7 +1,9 @@
+import { Suspense } from "react";
 import { Outlet } from "react-router-dom";
 import Navbar from "../Components/NavBar"
 import Footer from "../Components/Footer";
 import WhatsAppFab from "../Components/WhatsAppFab";
+import PageLoader from "../Components/PageLoader";
 
 const Layout = () => {
   return (
@@ -9,7 +11,10 @@ const Layout = () => {
       <Navbar />
 
       <main className="flex-1">
-        <Outlet />
+        {/* Mientras se descarga una página, el menú y el footer siguen visibles */}
+        <Suspense fallback={<PageLoader />}>
+          <Outlet />
+        </Suspense>
       </main>
 
       <Footer/>
