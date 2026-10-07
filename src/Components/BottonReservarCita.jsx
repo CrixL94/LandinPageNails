@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Calendar } from "primereact/calendar";
@@ -8,46 +8,104 @@ import Swal from "sweetalert2";
 import { InputMask } from "primereact/inputmask";
 import { Dropdown } from "primereact/dropdown";
 import { generarHoras } from "../Services/Funciones";
-import SocialIcons from "./SocialIcons";
+import { whatsappUrl } from "../Services/infoNegocio";
+
+const FORM_INICIAL = {
+  nombre: "",
+  celular: "",
+  iddetalleservicio: null,
+  fecha: null,
+  hora: "",
+};
+
+const ERRORES_INICIALES = {
+  nombre: false,
+  celular: false,
+  iddetalleservicio: false,
+  fecha: false,
+  hora: false,
+};
+
+const horasDisponibles = generarHoras();
+
+// Fecha en hora local (YYYY-MM-DD); toISOString() usa UTC y puede cambiar el día
+const formatearFecha = (fecha) => {
+  const y = fecha.getFullYear();
+  const m = String(fecha.getMonth() + 1).padStart(2, "0");
+  const d = String(fecha.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
+
+const aMinutos = (hora24) => {
+  const [h, m] = hora24.split(":").map(Number);
+  return h * 60 + m;
+};
+
+const minutosAhora = () => {
+  const ahora = new Date();
+  return ahora.getHours() * 60 + ahora.getMinutes();
+};
+
+const esHoy = (fecha) =>
+  !!fecha && formatearFecha(fecha) === formatearFecha(new Date());
+
+// Si la fecha es hoy, solo quedan las horas que aún no han pasado
+const horasParaFecha = (fecha) =>
+  esHoy(fecha)
+    ? horasDisponibles.filter((h) => aMinutos(h.value) > minutosAhora())
+    : horasDisponibles;
+
+// Primer día reservable: hoy, o mañana si ya no quedan horas hoy
+const calcularFechaMinima = () => {
+  const fecha = new Date();
+  fecha.setHours(0, 0, 0, 0);
+  if (horasParaFecha(new Date()).length === 0) fecha.setDate(fecha.getDate() + 1);
+  return fecha;
+};
+
+const esFechaHoraPasada = (fecha, hora) =>
+  fecha < calcularFechaMinima() ||
+  (esHoy(fecha) && aMinutos(hora) <= minutosAhora());
 
 const BotonReservaCita = ({
-  textoAntes,
-  textoDespues,
-  marca = "Nail`s Art Suray",
-  textoBoton,
+  textoBoton = "Reserva tu cita",
+  variant = "primary",
+  className = "",
 }) => {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [servicios, setServicios] = useState([]);
-  const [formData, setFormData] = useState({
-    nombre: "",
-    celular: "",
-    iddetalleservicio: null,
-    fecha: null,
-    hora: "",
-  });
-
-  const [errors, setErrors] = useState({
-    nombre: false,
-    celular: false,
-    iddetalleservicio: null,
-    fecha: false,
-    hora: false,
-  });
+  const [formData, setFormData] = useState(FORM_INICIAL);
+  const [errors, setErrors] = useState(ERRORES_INICIALES);
 
   const getServicios = async () => {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("vta_detalles_servicios")
       .select("*")
       .eq("id_estado", 1);
 
-    setServicios(data);
+    setServicios(data || []);
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  const abrir = () => {
+    setVisible(true);
+    if (servicios.length === 0) getServicios();
+  };
+
+  const setCampo = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: false }));
+  };
+
+  const handleChange = (e) => setCampo(e.target.name, e.target.value);
+
+  // Al cambiar el día se borra la hora si ya no está disponible en ese día
+  const cambiarFecha = (fecha) => {
+    setFormData((prev) => {
+      const sigueDisponible = horasParaFecha(fecha).some((h) => h.value === prev.hora);
+      return { ...prev, fecha, hora: sigueDisponible ? prev.hora : "" };
+    });
+    setErrors((prev) => ({ ...prev, fecha: false }));
   };
 
   const handleSubmit = async (e) => {
@@ -63,6 +121,11 @@ const BotonReservaCita = ({
       hora: !hora.trim(),
     };
 
+    // La hora pudo pasar mientras el diálogo estaba abierto
+    if (fecha && hora && esFechaHoraPasada(fecha, hora)) {
+      newErrors.hora = "Esa hora ya pasó, elige otra";
+    }
+
     setErrors(newErrors);
 
     const hasErrors = Object.values(newErrors).some((v) => v);
@@ -74,7 +137,7 @@ const BotonReservaCita = ({
       {
         nombrecompleto: nombre,
         celular,
-        dia: fecha.toISOString().split("T")[0],
+        dia: formatearFecha(fecha),
         hora,
         iddetalleservicio: formData.iddetalleservicio,
         idestado: 3,
@@ -88,24 +151,11 @@ const BotonReservaCita = ({
         icon: "error",
         title: "Algo salió mal",
         text: "No se pudo reservar tu cita. Intenta nuevamente o contáctanos por WhatsApp.",
-        footer:
-          '<a href="https://wa.me/50493367328" target="_blank" rel="noopener noreferrer">Escribir por WhatsApp</a>',
-        confirmButtonColor: "#8B5CF6",
+        footer: `<a href="${whatsappUrl()}" target="_blank" rel="noopener noreferrer">Escribir por WhatsApp</a>`,
+        confirmButtonColor: "#9c5a64",
       });
     } else {
-      setVisible(false);
-      setFormData({
-        nombre: "",
-        celular: "",
-        fecha: null,
-        hora: "",
-      });
-      setErrors({
-        nombre: false,
-        celular: false,
-        fecha: false,
-        hora: false,
-      });
+      onHide();
       Swal.fire({
         icon: "success",
         title: "Cita reservada",
@@ -118,57 +168,47 @@ const BotonReservaCita = ({
 
   const onHide = () => {
     setVisible(false);
-    setFormData({
-      nombre: "",
-      celular: "",
-      iddetalleservicio: null,
-      fecha: null,
-      hora: "",
-    });
-    setErrors({
-      nombre: false,
-      celular: false,
-      iddetalleservicio: false,
-      fecha: false,
-      hora: false,
-    });
+    setFormData(FORM_INICIAL);
+    setErrors(ERRORES_INICIALES);
   };
 
-  useEffect(() => {
-    getServicios();
-  }, []);
-
-  const horasDisponibles = generarHoras();
+  const header = (
+    <div>
+      <p className="eyebrow mb-2">Nail's Art Suray</p>
+      <h2 className="font-display text-3xl font-medium text-ink-900">
+        Reserva tu cita
+      </h2>
+      <p className="mt-1 text-sm font-normal text-ink-500">
+        Te confirmaremos por WhatsApp o llamada.
+      </p>
+    </div>
+  );
 
   return (
-    <div className="mt-4">
-      <div className="text-lg font-semibold mb-4">
-        {textoAntes} <span className="text-purple-600">{marca}</span>
-        {textoDespues}
-      </div>
-
+    <>
       <button
-        className="bg-purple-600 hover:bg-purple-700 text-white py-3 px-8 rounded-full transition duration-300 text-lg"
-        onClick={() => setVisible(true)}
+        type="button"
+        className={`${variant === "ghost" ? "btn-ghost" : "btn-primary"} ${className}`}
+        onClick={abrir}
       >
-        <i className="pi pi-calendar mr-2" />
+        <i className="pi pi-calendar" />
         {textoBoton}
       </button>
 
       <Dialog
-        header="Reservar Cita"
+        header={header}
         visible={visible}
         onHide={onHide}
-        className="w-[100%] sm:w-[40%]"
+        className="w-[94vw] max-w-lg"
         modal
+        blockScroll
+        draggable={false}
+        dismissableMask
       >
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-4 text-left text-gray-700"
-        >
+        <form onSubmit={handleSubmit} className="space-y-4 pt-2" noValidate>
           {/* NOMBRE */}
           <div>
-            <label htmlFor="nombre" className="font-semibold block mb-2">
+            <label htmlFor="nombre" className="field-label">
               Nombre completo
             </label>
             <InputText
@@ -177,16 +217,15 @@ const BotonReservaCita = ({
               placeholder="Nombre y apellido"
               value={formData.nombre}
               onChange={handleChange}
-              className={`w-full`}
+              className="w-full"
+              invalid={errors.nombre}
             />
-            {errors.nombre && (
-              <p className="text-sm text-red-500 mt-1">Campo requerido</p>
-            )}
+            {errors.nombre && <p className="field-error">Campo requerido</p>}
           </div>
 
           {/* CELULAR */}
           <div>
-            <label htmlFor="celular" className="font-semibold block mb-2">
+            <label htmlFor="celular" className="field-label">
               Celular
             </label>
             <InputMask
@@ -196,113 +235,115 @@ const BotonReservaCita = ({
               placeholder="+504 9999-9999"
               value={formData.celular}
               onChange={handleChange}
-              type="tel"
-              className={`w-full`}
+              className="w-full"
+              invalid={errors.celular}
             />
-            {errors.celular && (
-              <p className="text-sm text-red-500 mt-1">Campo requerido</p>
-            )}
+            {errors.celular && <p className="field-error">Campo requerido</p>}
           </div>
 
+          {/* SERVICIO */}
           <div>
-            <label htmlFor="servicio" className="font-semibold block mb-2">
+            <label htmlFor="servicio" className="field-label">
               Servicio
             </label>
             <Dropdown
-              id="servicio"
+              inputId="servicio"
               name="iddetalleservicio"
               value={formData.iddetalleservicio}
               options={servicios}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  iddetalleservicio: e.value,
-                }))
-              }
+              onChange={(e) => setCampo("iddetalleservicio", e.value)}
               optionLabel="nombre"
               optionValue="id"
               placeholder="Selecciona un servicio"
+              emptyMessage="Cargando servicios…"
               className="w-full"
+              invalid={errors.iddetalleservicio}
             />
             {errors.iddetalleservicio && (
-              <p className="text-sm text-red-500 mt-1">Campo requerido</p>
+              <p className="field-error">Campo requerido</p>
             )}
           </div>
 
-          {/* FECHA */}
-          <div>
-            <label htmlFor="fecha" className="font-semibold block mb-2">
-              Día
-            </label>
-            <Calendar
-              id="fecha"
-              name="fecha"
-              value={formData.fecha}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, fecha: e.value }))
-              }
-              className={`w-full`}
-              showIcon
-              dateFormat="yy-mm-dd"
-              placeholder="Selecciona un día"
-              locale="es"
-            />
-            {errors.fecha && (
-              <p className="text-sm text-red-500 mt-1">Campo requerido</p>
-            )}
+          <div className="grid gap-4 sm:grid-cols-2">
+            {/* FECHA */}
+            <div>
+              <label htmlFor="fecha" className="field-label">
+                Día
+              </label>
+              <Calendar
+                inputId="fecha"
+                name="fecha"
+                value={formData.fecha}
+                onChange={(e) => cambiarFecha(e.value)}
+                className="w-full"
+                showIcon
+                dateFormat="dd/mm/yy"
+                placeholder="Elige un día"
+                locale="es"
+                minDate={calcularFechaMinima()}
+                disabledDays={[0]}
+                readOnlyInput
+                invalid={errors.fecha}
+              />
+              {errors.fecha && <p className="field-error">Campo requerido</p>}
+            </div>
+
+            {/* HORA */}
+            <div>
+              <label htmlFor="hora" className="field-label">
+                Hora
+              </label>
+              <Dropdown
+                inputId="hora"
+                name="hora"
+                value={formData.hora}
+                options={horasParaFecha(formData.fecha)}
+                onChange={(e) => setCampo("hora", e.value)}
+                placeholder={formData.fecha ? "Elige una hora" : "Elige primero el día"}
+                disabled={!formData.fecha}
+                emptyMessage="No quedan horarios para este día"
+                className="w-full"
+                scrollHeight="240px"
+                invalid={!!errors.hora}
+              />
+              {errors.hora && (
+                <p className="field-error">
+                  {typeof errors.hora === "string" ? errors.hora : "Campo requerido"}
+                </p>
+              )}
+            </div>
           </div>
 
-          {/* HORA */}
-          <div>
-            <label htmlFor="hora" className="font-semibold block mb-2">
-              Hora
-            </label>
-            <Dropdown
-              id="hora"
-              name="hora"
-              value={formData.hora}
-              options={horasDisponibles}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  hora: e.value,
-                }))
-              }
-              placeholder="Selecciona una hora"
-              className={`w-full`}
-            />
-            {errors.hora && (
-              <p className="text-sm text-red-500 mt-1">Campo requerido</p>
-            )}
-          </div>
+          <p className="text-xs text-ink-400">
+            Atendemos de lunes a sábado, únicamente con cita previa.
+          </p>
 
           {/* BOTÓN */}
-          <button
-            type="submit"
-            disabled={loading}
-            className={`bg-purple-600 hover:bg-purple-700 text-white py-3 px-8 rounded-full transition duration-300 text-lg w-full flex items-center justify-center ${
-              loading ? "opacity-70 cursor-not-allowed" : ""
-            }`}
-          >
+          <button type="submit" disabled={loading} className="btn-primary w-full py-3.5 text-base">
             {loading ? (
               <HashLoader color="white" size={22} />
             ) : (
               <>
-                <i className="pi pi-check mr-2"></i>
-                Reservar cita
+                <i className="pi pi-check" />
+                Confirmar reserva
               </>
             )}
           </button>
         </form>
 
-        <div className="flex sm:justify-end justify-center mt-5">
-          <p className="text-gray-500 font-semibold">
-            Síguenos en nuestras redes
-            <SocialIcons />
-          </p>
-        </div>
+        <p className="mt-5 text-center text-sm text-ink-500">
+          ¿Prefieres escribirnos?{" "}
+          <a
+            href={whatsappUrl()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-brand-600 underline-offset-4 hover:underline"
+          >
+            Reserva por WhatsApp
+          </a>
+        </p>
       </Dialog>
-    </div>
+    </>
   );
 };
 

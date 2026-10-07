@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { Card } from "primereact/card";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import { listarUrlsPublicas } from "../Services/Funciones";
-import { useNavigate } from "react-router-dom";
+import { fadeUp, stagger, viewportOnce } from "../Animations/Animations";
+import SectionHeading from "./SectionHeading";
 
 const ServiciosCard = () => {
-  const navigate = useNavigate(); 
   const [dataServicios, setDataServicios] = useState([]);
   const [filesDataServicios, setFilesDataServicios] = useState([]);
 
@@ -35,44 +36,65 @@ const ServiciosCard = () => {
     getInfo();
   }, []);
 
+  if (dataServicios.length === 0) return null;
+
   return (
-    <div className="flex-1">
-      <Card className="shadow-lg">
-        <h3 className="text-xl font-semibold mb-3 text-purple-500">
-          Servicios
-        </h3>
+    <section className="container-page py-20 sm:py-28">
+      <SectionHeading
+        eyebrow="Lo que hacemos"
+        title="Nuestros servicios"
+        subtitle="Cada set se diseña contigo: forma, largo, color y detalles a tu medida."
+      />
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {dataServicios.map((servicio) => {
-            const imagen = filesDataServicios.find(
-              (img) => img.nombre === servicio.imagen_url
-            );
+      <motion.div
+        variants={stagger}
+        initial="hidden"
+        whileInView="visible"
+        viewport={viewportOnce}
+        className="mt-12 flex flex-wrap justify-center gap-6"
+      >
+        {dataServicios.map((servicio) => {
+          const imagen = filesDataServicios.find(
+            (img) => img.nombre === servicio.imagen_url
+          );
 
-            return (
-              <div
-                key={servicio.id}
-                onClick={() => navigate("/servicios")}
-                className="bg-gray-100 rounded-lg shadow-md sm:p-4 p-2 hover:shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer"
+          return (
+            <motion.div
+              key={servicio.id}
+              variants={fadeUp}
+              className="w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]"
+            >
+              <Link
+                to="/servicios"
+                className="group relative block aspect-[4/5] overflow-hidden rounded-3xl bg-brand-100 shadow-soft transition duration-500 hover:shadow-lift"
               >
                 {imagen && (
                   <img
                     src={imagen.url}
                     alt={servicio.nombre}
-                    className="w-full object-cover rounded-md mb-3"
+                    loading="lazy"
+                    className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
                   />
                 )}
-                <h4 className="text-lg font-semibold text-purple-600 mb-1">
-                  {servicio.nombre}
-                </h4>
-                <p className="text-sm text-gray-600 mb-2">
-                  {servicio.descripcion}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      </Card>
-    </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-ink-900/85 via-ink-900/25 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-6 text-white">
+                  <h3 className="font-display text-3xl font-medium">
+                    {servicio.nombre}
+                  </h3>
+                  <p className="mt-2 line-clamp-2 text-sm text-white/80">
+                    {servicio.descripcion}
+                  </p>
+                  <span className="mt-4 inline-flex items-center gap-2 text-xs tracking-[0.2em] text-white/90 uppercase">
+                    Ver detalles
+                    <i className="pi pi-arrow-right text-xs transition-transform duration-300 group-hover:translate-x-1" />
+                  </span>
+                </div>
+              </Link>
+            </motion.div>
+          );
+        })}
+      </motion.div>
+    </section>
   );
 };
 

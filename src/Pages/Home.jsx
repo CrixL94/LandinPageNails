@@ -1,12 +1,19 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "../supabaseClient";
-import { HashLoader } from "react-spinners";
 import { motion } from "framer-motion";
 import { listarUrlsPublicas } from "../Services/Funciones";
 import AboutUs from "./AboutUs";
-import { slideInRight } from "../Animations/Animations";
+import { fadeUp, stagger } from "../Animations/Animations";
 import BotonReservaCita from "../Components/BottonReservarCita";
+import PageLoader from "../Components/PageLoader";
 import Contacto from "./Contacto";
+
+const CONFIANZA = [
+  { icono: "pi pi-sparkles", texto: "Productos premium" },
+  { icono: "pi pi-shield", texto: "Higiene garantizada" },
+  { icono: "pi pi-calendar", texto: "Solo con cita" },
+];
 
 const Home = () => {
   const [inicioData, setInicioData] = useState([]);
@@ -18,14 +25,7 @@ const Home = () => {
 
     const { data, error } = await supabase.from("vta_inicio_web").select("*");
 
-    if (error) {
-      setInicioData([]);
-      setFilesData([]);
-      setLoading(false);
-      return;
-    }
-
-    if (!data) {
+    if (error || !data) {
       setInicioData([]);
       setFilesData([]);
       setLoading(false);
@@ -54,60 +54,115 @@ const Home = () => {
     fetchInicioData();
   }, []);
 
-  const imagenFondo = filesData.find(
-    (img) => img.nombre === inicioData[0].imagen_url_fondo
-  );
-
   const dataInicio = inicioData[0];
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <HashLoader color="#9810fa" size={50} />
-      </div>
-    );
-  }
+  const imagenFondo = filesData.find(
+    (img) => img.nombre === dataInicio?.imagen_url_fondo
+  );
+
+  if (loading) return <PageLoader />;
 
   return (
     <>
-      <motion.div
-        variants={slideInRight}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-        className="flex flex-col md:flex-row items-center justify-center min-h-screen sm:px-[15rem] sm:mb-0 mb-4"
-      >
-        <div className="flex-1 text-center md:text-left sm:p-8 p-4">
-          <h1 className="text-2xl sm:text-6xl font-bold text-purple-600 sm:mb-4 sm:mt-0 mt-[7rem]">
-            {dataInicio?.titulo}
-          </h1>
+      <section className="relative overflow-hidden">
+        {/* Manchas decorativas */}
+        <div className="pointer-events-none absolute -top-40 -right-32 h-[28rem] w-[28rem] rounded-full bg-brand-100 blur-3xl" />
+        <div className="pointer-events-none absolute bottom-0 -left-40 h-80 w-80 rounded-full bg-sand blur-3xl" />
 
-          <p className="sm:text-2xl text-base md:text-lg text-gray-600 mb-6">
-            <span className="font-semibold sm:text-lg text-base text-purple-500">
-              {dataInicio?.subtitulo}
-            </span>
-            <span> </span>
-            {dataInicio?.resumen}
-          </p>
+        <div className="container-page relative grid min-h-screen items-center gap-14 pt-28 pb-20 md:grid-cols-[1.1fr_1fr] md:gap-10 md:pt-24">
+          <motion.div
+            variants={stagger}
+            initial="hidden"
+            animate="visible"
+            className="text-center md:text-left"
+          >
+            <motion.p variants={fadeUp} className="eyebrow mb-6">
+              Nail Studio · Residencial Green Valley
+            </motion.p>
 
-          <BotonReservaCita
-            textoAntes={""}
-            textoDespues={""}
-            marca={""}
-            textoBoton={"Reserva tu cita"}
-          />
+            <motion.h1 variants={fadeUp} className="heading-xl">
+              {dataInicio?.titulo?.replace("`", "'") ?? "Nail's Art Suray"}
+            </motion.h1>
+
+            <motion.p
+              variants={fadeUp}
+              className="mx-auto mt-6 max-w-lg text-base leading-relaxed text-ink-500 sm:text-lg md:mx-0"
+            >
+              {dataInicio?.subtitulo && (
+                <span className="font-display text-xl text-brand-600 italic sm:text-2xl">
+                  {dataInicio.subtitulo}{" "}
+                </span>
+              )}
+              {dataInicio?.resumen}
+            </motion.p>
+
+            <motion.div
+              variants={fadeUp}
+              className="mt-9 flex flex-col items-center gap-3 sm:flex-row sm:justify-center md:justify-start"
+            >
+              <BotonReservaCita textoBoton="Reserva tu cita" />
+              <Link to="/galeria" className="btn-ghost">
+                Ver trabajos
+                <i className="pi pi-arrow-right text-xs" />
+              </Link>
+            </motion.div>
+
+            <motion.ul
+              variants={fadeUp}
+              className="mt-10 flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm text-ink-500 md:justify-start"
+            >
+              {CONFIANZA.map((item) => (
+                <li key={item.texto} className="flex items-center gap-2">
+                  <i className={`${item.icono} text-brand-500`} />
+                  {item.texto}
+                </li>
+              ))}
+            </motion.ul>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
+            className="relative mx-auto w-full max-w-[22rem] sm:max-w-md"
+          >
+            {/* Contorno desplazado */}
+            <div className="frame-arch absolute inset-0 translate-x-4 translate-y-4 border border-brand-300 sm:translate-x-6 sm:translate-y-6" />
+
+            <div className="frame-arch relative aspect-[4/5] bg-brand-100 shadow-lift">
+              {imagenFondo && (
+                <img
+                  src={imagenFondo.url}
+                  alt="Uñas acrílicas de Nail's Art Suray"
+                  className="h-full w-full object-cover"
+                  fetchPriority="high"
+                />
+              )}
+            </div>
+
+            {/* Tarjeta flotante */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.7 }}
+              className="card-soft absolute -bottom-6 -left-2 flex items-center gap-3 px-5 py-4 sm:-left-10"
+            >
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-50 text-brand-600">
+                <i className="pi pi-palette" />
+              </span>
+              <span className="text-left">
+                <span className="font-display block text-lg leading-tight text-ink-900">
+                  Diseños a tu medida
+                </span>
+                <span className="text-xs text-ink-400">Forma, largo y color</span>
+              </span>
+            </motion.div>
+          </motion.div>
         </div>
+      </section>
 
-        <div className="flex-1">
-          <img
-            src={`${imagenFondo?.url}`}
-            alt="Manicura y Pedicura"
-            className="w-full h-full object-cover sm:rounded-xl shadow-lg"
-          />
-        </div>
-      </motion.div>
-      <AboutUs />
-      <Contacto />
+      <AboutUs embedded />
+      <Contacto embedded />
     </>
   );
 };

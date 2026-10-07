@@ -1,31 +1,52 @@
 import { useState } from "react";
-import contactImg from "../assets/reservar.webp";
 import { motion } from "framer-motion";
-import { slideInRight } from "../Animations/Animations";
+import { fadeUp, stagger, viewportOnce } from "../Animations/Animations";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { supabase } from "../supabaseClient";
 import Swal from "sweetalert2";
 import SocialIcons from "../Components/SocialIcons";
 import MapView from "../Components/Mapa";
+import PageHeader from "../Components/PageHeader";
+import SectionHeading from "../Components/SectionHeading";
 import { HashLoader } from "react-spinners";
 import { InputMask } from "primereact/inputmask";
+import { NEGOCIO, whatsappUrl } from "../Services/infoNegocio";
 
-const Contacto = () => {
+const ACCESOS = [
+  {
+    icono: "pi pi-whatsapp",
+    titulo: "WhatsApp",
+    texto: "Respuesta rápida",
+    href: whatsappUrl(),
+    externo: true,
+  },
+  {
+    icono: "pi pi-phone",
+    titulo: "Llámanos",
+    texto: NEGOCIO.telefonoVisible,
+    href: `tel:${NEGOCIO.telefono}`,
+  },
+  {
+    icono: "pi pi-clock",
+    titulo: "Horario",
+    texto: NEGOCIO.horario,
+    nota: NEGOCIO.nota,
+  },
+];
+
+const FORM_INICIAL = { nombre: "", celular: "", email: "", mensaje: "" };
+
+// `embedded`: se muestra dentro de Inicio, sin el encabezado de página
+const Contacto = ({ embedded = false }) => {
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    nombre: "",
-    celular: "",
-    email: "",
-    mensaje: "",
-  });
+  const [formData, setFormData] = useState(FORM_INICIAL);
 
-  const handleChange = async (e) => {
+  const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
-    setLoading(true);
     e.preventDefault();
 
     const { nombre, celular, email, mensaje } = formData;
@@ -36,11 +57,12 @@ const Contacto = () => {
         text: "Por favor, completa tu nombre, celular y mensaje antes de enviar.",
         icon: "warning",
         confirmButtonText: "Entendido",
-        confirmButtonColor: "#8B5CF6",
+        confirmButtonColor: "#9c5a64",
       });
-      setLoading(false);
       return;
     }
+
+    setLoading(true);
 
     const { error } = await supabase.from("contactos").insert([
       {
@@ -52,14 +74,15 @@ const Contacto = () => {
       },
     ]);
 
+    setLoading(false);
+
     if (error) {
       Swal.fire({
         icon: "error",
         title: "Algo salió mal",
         text: "No se pudo enviar tu mensaje. Puedes contactarnos directamente por WhatsApp.",
-        footer:
-          '<a href="https://wa.me/50493367328" target="_blank" rel="noopener noreferrer">Escribir por WhatsApp</a>',
-        confirmButtonColor: "#8B5CF6",
+        footer: `<a href="${whatsappUrl()}" target="_blank" rel="noopener noreferrer">Escribir por WhatsApp</a>`,
+        confirmButtonColor: "#9c5a64",
       });
     } else {
       Swal.fire({
@@ -69,33 +92,93 @@ const Contacto = () => {
         showConfirmButton: false,
         timer: 3000,
       });
-      setFormData({ nombre: "", celular: "", email: "", mensaje: "" });
-      setLoading(false);
+      setFormData(FORM_INICIAL);
     }
   };
 
   return (
-    <motion.div variants={slideInRight} initial="hidden" animate="visible">
-      <section className="sm:px-[15rem] sm:mb-0 mb-4 text-gray-800">
-        <div className="flex flex-col md:flex-row items-center justify-center min-h-screen">
-          <div className="flex-1 text-center md:text-left sm:p-8 p-4">
-            <h1 className="text-2xl sm:text-6xl font-bold text-purple-600 sm:mb-4 sm:mt-0 mt-[7rem]">
-              Contáctanos
-            </h1>
+    <>
+      {embedded ? null : (
+        <PageHeader
+          eyebrow="Contacto"
+          title="Hablemos"
+          subtitle="¿Tienes dudas o deseas reservar una cita? Estamos aquí para ayudarte."
+        />
+      )}
 
-            <p className="sm:text-2xl text-base md:text-lg text-gray-600 mb-6">
-              ¿Tienes dudas o deseas reservar una cita? Estamos aquí para
-              ayudarte.
-              <br className="hidden sm:block" />
-            </p>
+      <section className={`container-page ${embedded ? "py-20 sm:py-28" : "py-16 sm:py-20"}`}>
+        {embedded && (
+          <SectionHeading
+            eyebrow="Contacto"
+            title="Hablemos"
+            subtitle="¿Tienes dudas o deseas reservar una cita? Estamos aquí para ayudarte."
+            className="mb-12"
+          />
+        )}
 
-            <form onSubmit={handleSubmit} className="space-y-4 text-left">
+        <div className="grid gap-8 lg:grid-cols-[1fr_1.4fr]">
+          {/* Accesos directos */}
+          <motion.div
+            variants={stagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className="flex flex-col gap-4"
+          >
+            {ACCESOS.map((item) => {
+              const Tag = item.href ? "a" : "div";
+              return (
+                <motion.div key={item.titulo} variants={fadeUp}>
+                  <Tag
+                    {...(item.href && { href: item.href })}
+                    {...(item.externo && { target: "_blank", rel: "noopener noreferrer" })}
+                    className={`card-soft flex items-center gap-4 p-5 ${
+                      item.href ? "group transition duration-300 hover:-translate-y-0.5 hover:shadow-lift" : ""
+                    }`}
+                  >
+                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-600 transition group-hover:bg-brand-600 group-hover:text-white">
+                      <i className={`${item.icono} text-lg`} />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="font-display block text-xl text-ink-900">{item.titulo}</span>
+                      <span className="block text-sm text-ink-500">{item.texto}</span>
+                      {item.nota && <span className="block text-xs text-ink-400">{item.nota}</span>}
+                    </span>
+                    {item.href && (
+                      <i className="pi pi-arrow-right text-xs text-brand-400 transition-transform group-hover:translate-x-1" />
+                    )}
+                  </Tag>
+                </motion.div>
+              );
+            })}
+
+            <motion.div variants={fadeUp} className="card-soft p-5">
+              <p className="mb-3 text-sm font-medium text-ink-700">Síguenos en nuestras redes</p>
+              <SocialIcons size="sm" />
+            </motion.div>
+          </motion.div>
+
+          {/* Formulario */}
+          <motion.form
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            onSubmit={handleSubmit}
+            className="card-soft space-y-5 p-6 sm:p-10"
+          >
+            <div>
+              <h2 className="heading-md">Envíanos un mensaje</h2>
+              <p className="mt-1 text-sm text-ink-500">Te responderemos lo antes posible.</p>
+            </div>
+
+            <div className="grid gap-5 sm:grid-cols-2">
               <div>
-                <label htmlFor="nombre" className="font-semibold block mb-2">
+                <label htmlFor="contacto-nombre" className="field-label">
                   Nombre
                 </label>
                 <InputText
-                  id="nombre"
+                  id="contacto-nombre"
                   name="nombre"
                   placeholder="Nombre y apellido"
                   value={formData.nombre}
@@ -105,11 +188,11 @@ const Contacto = () => {
               </div>
 
               <div>
-                <label htmlFor="celular" className="font-semibold block mb-2">
+                <label htmlFor="contacto-celular" className="field-label">
                   Celular
                 </label>
                 <InputMask
-                  id="celular"
+                  id="contacto-celular"
                   name="celular"
                   mask="+504 9999-9999"
                   placeholder="+504 9999-9999"
@@ -119,92 +202,57 @@ const Contacto = () => {
                   className="w-full"
                 />
               </div>
-
-              <div>
-                <label htmlFor="email" className="font-semibold block mb-2">
-                  Correo electrónico (opcional)
-                </label>
-                <InputText
-                  id="email"
-                  name="email"
-                  placeholder="ejemplo@correo.com"
-                  keyfilter="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="mensaje" className="font-semibold block mb-2">
-                  Mensaje
-                </label>
-                <InputTextarea
-                  id="mensaje"
-                  name="mensaje"
-                  placeholder="Mensaje....."
-                  value={formData.mensaje}
-                  onChange={handleChange}
-                  className="w-full"
-                  rows={4}
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className={`bg-purple-600 hover:bg-purple-700 text-white py-3 px-8 rounded-full transition duration-300 text-lg w-full mb-2 flex items-center justify-center cursor-pointer ${
-                  loading ? "opacity-70 cursor-not-allowed" : ""
-                }`}
-              >
-                {loading ? (
-                  <>
-                    <HashLoader color="white" size={22} />
-                  </>
-                ) : (
-                  <>
-                    <i className="pi pi-send mr-2"></i>
-                    Enviar mensaje
-                  </>
-                )}
-              </button>
-            </form>
-
-            <div className="mt-8 text-left text-sm text-gray-600 grid grid-cols-1 sm:grid-cols-3 gap-8">
-              <div>
-                <p className="text-gray-500 font-semibold mb-2">
-                  Síguenos en nuestras redes:
-                </p>
-                <SocialIcons />
-              </div>
-              <div>
-                <p className="mb-1 font-semibold">📍 Dirección:</p>
-                <p>Residencial Green Valley</p>
-              </div>
-              <div>
-                <p className="mb-1 font-semibold">🕒 Horario de atención:</p>
-                <p>Lunes a Sábado</p>
-                <p className="text-gray-500">
-                  * Atendemos únicamente con cita previa
-                </p>
-              </div>
             </div>
-          </div>
 
-          <div className="flex-1">
-            <img
-              src={contactImg}
-              alt="Manicura y Pedicura"
-              className="w-full h-full object-cover sm:rounded-xl shadow-lg"
-            />
-          </div>
+            <div>
+              <label htmlFor="contacto-email" className="field-label">
+                Correo electrónico <span className="font-normal text-ink-400">(opcional)</span>
+              </label>
+              <InputText
+                id="contacto-email"
+                name="email"
+                placeholder="ejemplo@correo.com"
+                keyfilter="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="contacto-mensaje" className="field-label">
+                Mensaje
+              </label>
+              <InputTextarea
+                id="contacto-mensaje"
+                name="mensaje"
+                placeholder="Cuéntanos qué necesitas…"
+                value={formData.mensaje}
+                onChange={handleChange}
+                className="w-full"
+                rows={5}
+                autoResize
+              />
+            </div>
+
+            <button type="submit" disabled={loading} className="btn-primary w-full py-3.5 text-base">
+              {loading ? (
+                <HashLoader color="white" size={22} />
+              ) : (
+                <>
+                  <i className="pi pi-send" />
+                  Enviar mensaje
+                </>
+              )}
+            </button>
+          </motion.form>
         </div>
 
-        <div>
+        <div className="mt-12">
           <MapView />
         </div>
       </section>
-    </motion.div>
+    </>
   );
 };
 

@@ -1,16 +1,38 @@
 import { useEffect, useState } from "react";
-import { Card } from "primereact/card";
-import { Divider } from "primereact/divider";
 import { supabase } from "../supabaseClient";
-import { HashLoader } from "react-spinners";
 import { listarUrlsPublicas } from "../Services/Funciones";
 import ServiciosCard from "../Components/ServiciosCard";
 import TestimoniosCarousel from "../Components/TestimoniosCarousel";
 import BotonReservaCita from "../Components/BottonReservarCita";
+import PageLoader from "../Components/PageLoader";
+import SectionHeading from "../Components/SectionHeading";
 import { motion } from "framer-motion";
-import { slideInLeft } from "../Animations/Animations";
+import {
+  fadeUp,
+  slideInLeft,
+  slideInRight,
+  stagger,
+  viewportOnce,
+} from "../Animations/Animations";
 
-const AboutUs = () => {
+const VALORES = [
+  { icono: "pi pi-star", titulo: "Profesionalismo", texto: "Técnica cuidada en cada detalle." },
+  { icono: "pi pi-palette", titulo: "Creatividad", texto: "Diseños únicos, hechos para ti." },
+  { icono: "pi pi-shield", titulo: "Higiene y seguridad", texto: "Herramientas esterilizadas siempre." },
+  { icono: "pi pi-heart", titulo: "Atención personalizada", texto: "Te escuchamos antes de empezar." },
+  { icono: "pi pi-bolt", titulo: "Innovación constante", texto: "Tendencias y técnicas al día." },
+];
+
+const RAZONES = [
+  "Ambiente limpio, seguro y cómodo",
+  "Técnicas actualizadas y productos de alta calidad",
+  "Atención cálida y amigable",
+  "Citas puntuales y personalizadas",
+  "Más que un servicio, ¡una experiencia!",
+];
+
+// `embedded`: se muestra dentro de Inicio, sin el espaciado superior de página
+const AboutUs = ({ embedded = false }) => {
   const [inicioData, setInicioData] = useState([]);
   const [filesData, setFilesData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,14 +42,7 @@ const AboutUs = () => {
 
     const { data, error } = await supabase.from("about_us").select("*");
 
-    if (error) {
-      setInicioData([]);
-      setFilesData([]);
-      setLoading(false);
-      return;
-    }
-
-    if (!data) {
+    if (error || !data) {
       setInicioData([]);
       setFilesData([]);
       setLoading(false);
@@ -56,156 +71,164 @@ const AboutUs = () => {
     fetchInicioData();
   }, []);
 
-  const imagenFondo = filesData.find(
-    (img) => img.nombre === inicioData[0].imagen_url
-  );
-
   const dataInicio = inicioData[0];
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <HashLoader color="#9810fa" size={50} />
-      </div>
-    );
-  }
+  const imagenFondo = filesData.find(
+    (img) => img.nombre === dataInicio?.imagen_url
+  );
+
+  if (loading) return embedded ? null : <PageLoader />;
 
   return (
-    <motion.div
-      className="flex-1 text-center md:text-left sm:p-8 p-4"
-      variants={slideInLeft}
-      initial="hidden"
-      whileInView="visible"
-      // viewport={{ once: true, amount: 0.1 }}
-    >
-      <section className="sm:px-[15rem] mb-4 text-gray-800">
-        <div className="min-h-screen flex flex-col md:flex-row items-center justify-center sm:mt-0 mt-[7rem]">
-          <div className="flex-1">
-            <img
-              src={`${imagenFondo?.url}`}
-              alt="Manicura y Pedicura"
-              className="w-full h-full object-cover sm:rounded-xl shadow-lg"
-            />
+    <>
+      {/* Introducción */}
+      <section
+        className={`container-page grid items-center gap-14 md:grid-cols-2 md:gap-16 ${
+          embedded ? "py-20 sm:py-28" : "min-h-screen pt-32 pb-20"
+        }`}
+      >
+        <motion.div
+          variants={slideInRight}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+          className="relative mx-auto w-full max-w-sm sm:max-w-md"
+        >
+          <div className="frame-arch aspect-[4/5] bg-brand-100 shadow-lift">
+            {imagenFondo && (
+              <img
+                src={imagenFondo.url}
+                alt="Nuestro estudio de uñas"
+                loading="lazy"
+                className="h-full w-full object-cover"
+              />
+            )}
           </div>
+          <span className="font-display absolute -right-2 bottom-10 rotate-[-4deg] rounded-full bg-cream px-5 py-2 text-lg text-brand-600 italic shadow-soft ring-1 ring-brand-100 sm:-right-8">
+            Hecho con amor
+          </span>
+        </motion.div>
 
-          <div className="flex-1 text-center md:text-left sm:p-8 p-4">
-            <h1 className="text-2xl sm:text-6xl font-bold text-purple-600 sm:mb-4">
-              {dataInicio?.titulo}
-            </h1>
-
-            <p className="sm:text-2xl text-base md:text-lg text-gray-600 mb-6">
-              <span className="font-semibold sm:text-lg text-base text-purple-500">
-                {dataInicio?.subtitulo}
+        <motion.div
+          variants={slideInLeft}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+          className="text-center md:text-left"
+        >
+          <p className="eyebrow mb-5">Sobre nosotros</p>
+          {embedded ? (
+            <h2 className="heading-lg">{dataInicio?.titulo}</h2>
+          ) : (
+            <h1 className="heading-xl">{dataInicio?.titulo}</h1>
+          )}
+          <p className="mt-6 text-base leading-relaxed text-ink-500 sm:text-lg">
+            {dataInicio?.subtitulo && (
+              <span className="font-display text-xl text-brand-600 italic sm:text-2xl">
+                {dataInicio.subtitulo}{" "}
               </span>
-              <span> </span>
-              {dataInicio?.descripcion}
-              <br className="hidden sm:block" />
-            </p>
-
-          <BotonReservaCita
-            textoAntes={""}
-            textoDespues={""}
-            marca={""}
-            textoBoton={"Reserva tu cita"}
-          />
+            )}
+            {dataInicio?.descripcion}
+          </p>
+          <div className="mt-8">
+            <BotonReservaCita textoBoton="Reserva tu cita" />
           </div>
-        </div>
-
-        {/* Mision Vision */}
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
-          <Card>
-            <h3 className="text-xl font-semibold mb-2 text-purple-500">
-              Misión
-            </h3>
-            <p>{dataInicio?.mision}</p>
-          </Card>
-
-          <Card>
-            <h3 className="text-xl font-semibold mb-2 text-purple-500">
-              Visión
-            </h3>
-            <p>{dataInicio?.vision}</p>
-          </Card>
-        </div>
-
-        <Divider />
-
-        {/* Valores */}
-        <div className="mb-12 text-left">
-          <Card>
-            <h3 className="text-xl font-semibold mb-4 text-purple-500">
-              Nuestros Valores
-            </h3>
-            <ul className="list-disc list-inside space-y-1">
-              <li>✨ Profesionalismo</li>
-              <li>🎨 Creatividad</li>
-              <li>🧼 Higiene y seguridad</li>
-              <li>🌟 Atención personalizada</li>
-              <li>💡 Innovación constante</li>
-            </ul>
-          </Card>
-        </div>
-
-        <Divider />
-
-        {/* Elegirnos */}
-        <div className="mb-16 text-left">
-          <Card>
-            <h3 className="text-xl font-semibold mb-4 text-purple-500">
-              ¿Por qué elegirnos?
-            </h3>
-            <ul className="list-disc list-inside space-y-1">
-              <li>Ambiente limpio, seguro y cómodo</li>
-              <li>Técnicas actualizadas y productos de alta calidad</li>
-              <li>Atención cálida y amigable</li>
-              <li>Citas puntuales y personalizadas</li>
-              <li>Más que un servicio, ¡una experiencia!</li>
-            </ul>
-          </Card>
-        </div>
-
-        <Divider />
-
-        {/* Servicios */}
-        <div className="flex flex-col md:flex-row gap-8 mb-12 mt-5">
-          <ServiciosCard />
-        </div>
-
-        <Divider />
-
-        {/* Equipo */}
-        {/* <Card className="mb-12">
-        <h3 className="text-xl font-semibold mb-4 text-purple-500">
-          Nuestro Equipo
-        </h3>
-        <div className="grid sm:grid-cols-2 gap-6 text-center">
-          <div>
-            <img
-              src="/assets/persona1.jpg"
-              className="rounded-full w-32 h-32 mx-auto mb-2 object-cover"
-            />
-            <h4 className="font-semibold">María Fernanda</h4>
-            <p className="text-sm text-gray-600">
-              Especialista en uñas acrílicas
-            </p>
-          </div>
-          <div>
-            <img
-              src="/assets/persona2.jpg"
-              className="rounded-full w-32 h-32 mx-auto mb-2 object-cover"
-            />
-            <h4 className="font-semibold">Daniela López</h4>
-            <p className="text-sm text-gray-600">Diseño artístico y 3D</p>
-          </div>
-        </div>
-      </Card> */}
-
-        {/* <Divider /> */}
-
-        {/* Testimonios */}
-        <TestimoniosCarousel />
+        </motion.div>
       </section>
-    </motion.div>
+
+      {/* Misión y Visión */}
+      <section className="bg-sand py-20 sm:py-24">
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+          className="container-page grid gap-6 md:grid-cols-2"
+        >
+          {[
+            { icono: "pi pi-compass", titulo: "Misión", texto: dataInicio?.mision },
+            { icono: "pi pi-eye", titulo: "Visión", texto: dataInicio?.vision },
+          ].map((item) => (
+            <motion.article key={item.titulo} variants={fadeUp} className="card-soft p-8 sm:p-10">
+              <span className="mb-6 flex h-12 w-12 items-center justify-center rounded-full bg-brand-50 text-brand-600">
+                <i className={`${item.icono} text-lg`} />
+              </span>
+              <h3 className="heading-md mb-3">{item.titulo}</h3>
+              <p className="leading-relaxed text-ink-500">{item.texto}</p>
+            </motion.article>
+          ))}
+        </motion.div>
+      </section>
+
+      {/* Valores */}
+      <section className="container-page py-20 sm:py-28">
+        <SectionHeading eyebrow="Lo que nos define" title="Nuestros valores" />
+        <motion.ul
+          variants={stagger}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+          className="mt-12 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-5"
+        >
+          {VALORES.map((valor, i) => (
+            <motion.li
+              key={valor.titulo}
+              variants={fadeUp}
+              className={`card-soft p-6 text-center transition duration-300 hover:-translate-y-1 hover:shadow-lift ${
+                i === VALORES.length - 1 ? "col-span-2 lg:col-span-1" : ""
+              }`}
+            >
+              <span className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-50 text-brand-600">
+                <i className={valor.icono} />
+              </span>
+              <h3 className="font-display text-xl font-semibold text-ink-900">
+                {valor.titulo}
+              </h3>
+              <p className="mt-2 text-sm text-ink-500">{valor.texto}</p>
+            </motion.li>
+          ))}
+        </motion.ul>
+      </section>
+
+      {/* ¿Por qué elegirnos? */}
+      <section className="container-page pb-4">
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+          className="relative grid gap-10 overflow-hidden rounded-[2rem] bg-ink-900 p-8 text-white sm:p-14 md:grid-cols-[1fr_1.2fr] md:items-center"
+        >
+          <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-brand-600/30 blur-3xl" />
+          <div className="relative">
+            <p className="eyebrow mb-4 text-brand-300 before:bg-brand-300">
+              La diferencia
+            </p>
+            <h2 className="font-display text-4xl leading-tight font-medium sm:text-5xl">
+              ¿Por qué elegirnos?
+            </h2>
+            <div className="mt-8">
+              <BotonReservaCita textoBoton="Reserva tu cita" />
+            </div>
+          </div>
+          <ol className="relative space-y-5">
+            {RAZONES.map((razon, i) => (
+              <li key={razon} className="flex items-baseline gap-5 border-b border-white/10 pb-5 last:border-0 last:pb-0">
+                <span className="font-display text-2xl text-brand-300 lining-nums">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span className="text-white/85">{razon}</span>
+              </li>
+            ))}
+          </ol>
+        </motion.div>
+      </section>
+
+      <ServiciosCard />
+      <div className="bg-sand">
+        <TestimoniosCarousel />
+      </div>
+    </>
   );
 };
 
