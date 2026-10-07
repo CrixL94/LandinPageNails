@@ -37,6 +37,19 @@ export function obtenerUrlPublica(bucket, path) {
 }
 
 /**
+ * URL pública de un archivo cuyo nombre ya se conoce (viene de la tabla).
+ * Se arma localmente, sin consultar el listado del bucket.
+ * @param {string} bucket - Nombre del bucket
+ * @param {string} folder - Carpeta dentro del bucket
+ * @param {string} nombre - Nombre del archivo
+ * @returns {string|null}
+ */
+export function urlArchivo(bucket, folder, nombre) {
+  if (!nombre) return null;
+  return obtenerUrlPublica(bucket, `${folder}/${nombre}`);
+}
+
+/**
  * Combina listar archivos y obtener sus URLs públicas.
  * @param {string} bucket - Nombre del bucket
  * @param {string} folder - Carpeta dentro del bucket

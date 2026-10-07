@@ -1,7 +1,27 @@
+import { useEffect, useRef, useState } from "react";
 import { NEGOCIO, comoLlegarUrl } from "../Services/infoNegocio";
 
 const MapView = () => {
   const { lat, lng } = NEGOCIO.coordenadas;
+  const contenedorRef = useRef(null);
+  const [cargar, setCargar] = useState(false);
+
+  // El iframe de Google Maps pesa bastante: se crea solo al acercarse a la sección
+  useEffect(() => {
+    const el = contenedorRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setCargar(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "300px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div className="card-soft overflow-hidden">
@@ -21,7 +41,8 @@ const MapView = () => {
           Cómo llegar
         </a>
       </div>
-      <div className="h-[340px] w-full sm:h-[420px]">
+      <div ref={contenedorRef} className="h-[340px] w-full bg-sand sm:h-[420px]">
+        {cargar && (
         <iframe
           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4734.356458483754!2d-88.19070592411681!3d15.343742158449471!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8f668b00085d0307%3A0x782b87f112d88390!2sNails%20Art%20Suray!5e1!3m2!1ses!2shn!4v1754399753730!5m2!1ses!2shn"
           width="100%"
@@ -33,6 +54,7 @@ const MapView = () => {
           referrerPolicy="no-referrer-when-downgrade"
           title="Mapa de ubicación"
         />
+        )}
       </div>
     </div>
   );

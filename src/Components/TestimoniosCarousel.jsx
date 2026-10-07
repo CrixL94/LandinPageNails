@@ -12,14 +12,13 @@ const TestimoniosCarousel = () => {
   const [pausado, setPausado] = useState(false);
 
   const getInfo = async () => {
+    // Solo aprobados, y solo las columnas que se muestran (no el celular)
     const { data: testimonios } = await supabase
       .from("testimonios")
-      .select("*");
+      .select("id, nombre, contenido")
+      .eq("idestado", 4);
 
-    const filtrarAprobados = (testimonios || []).filter(
-      (s) => s.idestado === 4
-    );
-    setTestimoniosList(filtrarAprobados);
+    setTestimoniosList(testimonios || []);
   };
 
   useEffect(() => {

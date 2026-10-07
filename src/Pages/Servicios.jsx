@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { listarUrlsPublicas } from "../Services/Funciones";
+import { urlArchivo } from "../Services/Funciones";
 import { supabase } from "../supabaseClient";
 import { motion } from "framer-motion";
 import BotonReservaCita from "../Components/BottonReservarCita";
@@ -12,37 +12,16 @@ const Servicios = () => {
   const [loading, setLoading] = useState(true);
   const [dataServicios, setDataServicios] = useState([]);
   const [dataServiciosDetalles, setDataServiciosDetalles] = useState([]);
-  const [filesDataServicios, setFilesDataServicios] = useState([]);
 
   const infoServicios = async () => {
-    setLoading(true);
-    const { data } = await supabase.from("servicios").select("*");
+    // Servicios y detalles se piden en paralelo
+    const [{ data }, { data: dataDetalles }] = await Promise.all([
+      supabase.from("servicios").select("*").eq("id_estado", 1),
+      supabase.from("servicios_detalles").select("*").eq("id_estado", 1),
+    ]);
 
-    const serviciosFiltrados = (data || []).filter((s) => s.id_estado === 1);
-    setDataServicios(serviciosFiltrados);
-
-    const { data: dataDetalles } = await supabase
-      .from("servicios_detalles")
-      .select("*");
-    const serviciosDetallesFiltrados = (dataDetalles || []).filter(
-      (s) => s.id_estado === 1
-    );
-    setDataServiciosDetalles(serviciosDetallesFiltrados);
-
-    const nombresDeArchivo = serviciosFiltrados
-      .map((item) => item.imagen_url)
-      .filter(Boolean);
-
-    const urls = await listarUrlsPublicas("imagenes", "Servicios");
-
-    const urlsFiltradas = urls
-      .filter((url) => nombresDeArchivo.some((nombre) => url.includes(nombre)))
-      .map((url) => {
-        const nombre = url.split("/").pop();
-        return { nombre, url };
-      });
-
-    setFilesDataServicios(urlsFiltradas);
+    setDataServicios(data || []);
+    setDataServiciosDetalles(dataDetalles || []);
     setLoading(false);
   };
 
@@ -62,9 +41,7 @@ const Servicios = () => {
 
       <div className="container-page space-y-24 py-20 sm:space-y-32 sm:py-28">
         {dataServicios.map((servicio, index) => {
-          const imagen = filesDataServicios.find(
-            (img) => img.nombre === servicio.imagen_url
-          );
+          const imagen = urlArchivo("imagenes", "Servicios", servicio.imagen_url);
 
           const detallesDeServicio = dataServiciosDetalles.filter(
             (detalle) => detalle.id_servicio === servicio.id
@@ -85,7 +62,7 @@ const Servicios = () => {
                 <div className="frame-arch aspect-[4/5] bg-brand-100 shadow-lift">
                   {imagen && (
                     <img
-                      src={imagen.url}
+                      src={imagen}
                       alt={servicio.nombre}
                       loading="lazy"
                       className="h-full w-full object-cover"

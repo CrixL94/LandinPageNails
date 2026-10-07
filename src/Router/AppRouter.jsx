@@ -1,12 +1,15 @@
+import { lazy } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "../Layout/Layout";
 import Home from "../Pages/Home";
 import AboutUs from "../Pages/AboutUs";
 import ScrollToTop from "../Components/ScrollToTop";
-import Servicios from "../Pages/Servicios";
 import Contacto from "../Pages/Contacto";
-import Galeria from "../Pages/Galeria";
-import Testimonios from "../Pages/Testimonios";
+
+// Home ya incluye AboutUs y Contacto; el resto de páginas se descarga al visitarlas
+const Servicios = lazy(() => import("../Pages/Servicios"));
+const Galeria = lazy(() => import("../Pages/Galeria"));
+const Testimonios = lazy(() => import("../Pages/Testimonios"));
 
 const AppRouter = () => {
   return (

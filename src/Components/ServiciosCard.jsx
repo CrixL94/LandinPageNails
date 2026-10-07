@@ -2,34 +2,19 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { supabase } from "../supabaseClient";
-import { listarUrlsPublicas } from "../Services/Funciones";
+import { urlArchivo } from "../Services/Funciones";
 import { fadeUp, stagger, viewportOnce } from "../Animations/Animations";
 import SectionHeading from "./SectionHeading";
 
 const ServiciosCard = () => {
   const [dataServicios, setDataServicios] = useState([]);
-  const [filesDataServicios, setFilesDataServicios] = useState([]);
 
   const getInfo = async () => {
-    const { data } = await supabase.from("servicios").select("*");
-
-    const serviciosFiltrados = (data || []).filter((s) => s.id_estado === 1);
-    setDataServicios(serviciosFiltrados);
-
-    const nombresDeArchivo = serviciosFiltrados
-      .map((item) => item.imagen_url)
-      .filter(Boolean);
-
-    const urls = await listarUrlsPublicas("imagenes", "Servicios");
-
-    const urlsFiltradas = urls
-      .filter((url) => nombresDeArchivo.some((nombre) => url.includes(nombre)))
-      .map((url) => {
-        const nombre = url.split("/").pop();
-        return { nombre, url };
-      });
-
-    setFilesDataServicios(urlsFiltradas);
+    const { data } = await supabase
+      .from("servicios")
+      .select("*")
+      .eq("id_estado", 1);
+    setDataServicios(data || []);
   };
 
   useEffect(() => {
@@ -54,9 +39,7 @@ const ServiciosCard = () => {
         className="mt-12 flex flex-wrap justify-center gap-6"
       >
         {dataServicios.map((servicio) => {
-          const imagen = filesDataServicios.find(
-            (img) => img.nombre === servicio.imagen_url
-          );
+          const imagen = urlArchivo("imagenes", "Servicios", servicio.imagen_url);
 
           return (
             <motion.div
@@ -70,7 +53,7 @@ const ServiciosCard = () => {
               >
                 {imagen && (
                   <img
-                    src={imagen.url}
+                    src={imagen}
                     alt={servicio.nombre}
                     loading="lazy"
                     className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
