@@ -1,32 +1,263 @@
 @import "tailwindcss";
 
-* {
-  box-sizing: border-box;
+/* ───────────── Tokens de marca (salen del logo) ───────────── */
+@theme {
+  --color-brand-50: #fbf4f4;
+  --color-brand-100: #f6e7e7;
+  --color-brand-200: #ecd0d1;
+  --color-brand-300: #ddafb2;
+  --color-brand-400: #c8898e;
+  --color-brand-500: #b16d75;
+  --color-brand-600: #9c5a64;
+  --color-brand-700: #824952;
+  --color-brand-800: #6b3d45;
+  --color-brand-900: #57343a;
+
+  --color-cream: #fbf7f4;
+  --color-sand: #f5ede8;
+
+  --color-ink-300: #bfb0aa;
+  --color-ink-400: #a08d86;
+  --color-ink-500: #806c66;
+  --color-ink-600: #66544f;
+  --color-ink-700: #4f403c;
+  --color-ink-800: #3b302d;
+  --color-ink-900: #2a2220;
+
+  --color-gold: #c9a36b;
+
+  --font-display: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --font-sans: "Jost", ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-soft: 0 12px 32px -14px rgb(87 52 58 / 0.18);
+  --shadow-lift: 0 26px 52px -22px rgb(87 52 58 / 0.38);
 }
 
-html, body {
-  overflow-x: hidden !important;
-  max-width: 100% !important;
+/* ───────────── Base ───────────── */
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
+body {
+  @apply bg-cream font-sans text-ink-700 antialiased;
+}
 
+/* Bloqueo de scroll de PrimeReact (diálogo, menú móvil, galería).
+   Como html tiene overflow-x, el scroll vive en html y no en body:
+   hay que bloquearlo también ahí. */
+html:has(> body.p-overflow-hidden) {
+  overflow: hidden;
+}
+
+::selection {
+  @apply bg-brand-200 text-ink-900;
+}
+
+/* ───────────── Clases reutilizables ───────────── */
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-3 text-xs font-medium tracking-[0.28em] text-brand-600 uppercase;
+  }
+  .eyebrow::before {
+    content: "";
+    @apply h-px w-8 bg-brand-400;
+  }
+
+  .heading-xl {
+    @apply font-display text-[2.6rem] leading-[1.05] font-medium text-ink-900 sm:text-6xl lg:text-7xl;
+  }
+  .heading-lg {
+    @apply font-display text-4xl leading-tight font-medium text-ink-900 sm:text-5xl;
+  }
+  .heading-md {
+    @apply font-display text-2xl leading-snug font-semibold text-ink-900 sm:text-3xl;
+  }
+
+  .btn-primary {
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-full bg-brand-600 px-7 py-3 text-sm font-medium tracking-wide text-white shadow-soft transition duration-300 hover:-translate-y-0.5 hover:bg-brand-700 hover:shadow-lift focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0;
+  }
+  .btn-ghost {
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-full border border-brand-300 bg-transparent px-7 py-3 text-sm font-medium tracking-wide text-brand-700 transition duration-300 hover:border-brand-500 hover:bg-brand-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400;
+  }
+
+  .card-soft {
+    @apply rounded-3xl bg-white shadow-soft ring-1 ring-brand-100;
+  }
+
+  .field-label {
+    @apply mb-1.5 block text-sm font-medium text-ink-700;
+  }
+  .field-error {
+    @apply mt-1 text-xs text-red-600;
+  }
+
+  /* Marco en arco para fotos */
+  .frame-arch {
+    @apply overflow-hidden rounded-t-[999px] rounded-b-[2rem];
+  }
+}
+
+/* ───────────── PrimeReact (lara-light-pink) ───────────── */
+:root {
+  --font-family: "Jost", ui-sans-serif, system-ui, sans-serif;
+  --primary-color: #9c5a64;
+  --highlight-bg: #f6e7e7;
+  --highlight-text-color: #824952;
+  --focus-ring: 0 0 0 0.2rem #ecd0d1;
+  --text-color: #4f403c;
+}
+
+:root,
+.p-component,
+.p-inputtext,
+.p-link {
+  font-family: var(--font-family);
+}
+
+.p-inputtext,
+.p-dropdown,
+.p-calendar .p-inputtext {
+  border-color: #ecd0d1;
+  border-radius: 0.875rem;
+  background: #fff;
+  color: #3b302d;
+}
+.p-inputtext {
+  padding: 0.75rem 1rem;
+}
+.p-dropdown .p-inputtext {
+  border: 0;
+}
+.p-inputtext::placeholder,
+.p-dropdown .p-dropdown-label.p-placeholder {
+  color: #a08d86;
+}
+.p-inputtext:enabled:hover,
+.p-dropdown:not(.p-disabled):hover {
+  border-color: #c8898e;
+}
+.p-inputtext:enabled:focus,
+.p-dropdown:not(.p-disabled).p-focus {
+  border-color: #9c5a64;
+  box-shadow: 0 0 0 0.2rem #f6e7e7;
+}
+.p-inputtext.p-invalid,
+.p-dropdown.p-invalid,
+.p-calendar.p-invalid > .p-inputtext {
+  border-color: #dc2626;
+}
+
+.p-dropdown-panel {
+  border-radius: 0.875rem;
+  overflow: hidden;
+}
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight {
+  background: #f6e7e7;
+  color: #824952;
+}
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item:not(.p-highlight):not(.p-disabled):hover {
+  background: #fbf4f4;
+}
+
+/* Calendario */
+.p-calendar .p-inputtext {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
 .p-calendar .p-datepicker-trigger {
-  @apply bg-purple-600;
-  border-color: #7c3aed;
+  background: #9c5a64;
+  border-color: #9c5a64;
+  border-top-right-radius: 0.875rem;
+  border-bottom-right-radius: 0.875rem;
+}
+.p-calendar .p-datepicker-trigger:enabled:hover {
+  background: #824952;
+  border-color: #824952;
+}
+.p-datepicker {
+  border-radius: 1rem;
+}
+.p-datepicker .p-datepicker-header .p-datepicker-title button:enabled:hover {
+  color: #9c5a64;
+}
+.p-datepicker table td > span.p-highlight {
+  background: #9c5a64;
+  color: #fff;
+}
+.p-datepicker table td.p-datepicker-today > span {
+  background: #f6e7e7;
+  color: #824952;
+}
+.p-datepicker table td > span.p-disabled {
+  opacity: 0.35;
 }
 
-/* Cambiar el fondo al pasar el mouse */
-.p-calendar .p-datepicker-trigger:hover {
-  @apply bg-purple-700;
+/* Diálogo */
+.p-dialog {
+  border-radius: 1.75rem;
+  overflow: hidden;
+  box-shadow: 0 30px 60px -25px rgb(87 52 58 / 0.45);
+}
+.p-dialog .p-dialog-header {
+  background: #fbf7f4;
+  padding: 1.5rem 1.75rem 1rem;
+}
+.p-dialog .p-dialog-content {
+  background: #fbf7f4;
+  padding: 0 1.75rem 1.75rem;
+}
+.p-dialog-mask.p-component-overlay {
+  background: rgb(42 34 32 / 0.45);
+  backdrop-filter: blur(3px);
+}
+.p-dialog .p-dialog-header .p-dialog-header-icon:enabled:hover,
+.p-sidebar .p-sidebar-header .p-sidebar-close:enabled:hover {
+  background: #f6e7e7;
+  color: #824952;
 }
 
-.p-inputtext:focus,
-.p-inputwrapper-focus,
-.p-dropdown .p-inputtext:focus,
-.p-inputmask:focus {
-  @apply border-purple-600 ring-1 ring-purple-600;
+/* Sidebar */
+.p-sidebar {
+  background: #fbf7f4;
 }
 
-.p-calendar.p-focus > .p-inputtext {
-  @apply border-purple-600 ring-1 ring-purple-600;
+/* Galería a pantalla completa (solo cuando está abierta; el mask
+   permanece en el DOM aunque esté cerrada) */
+.p-galleria-mask.p-component-overlay {
+  background: rgb(42 34 32 / 0.94);
+  backdrop-filter: blur(4px);
+}
+.p-galleria .p-galleria-close {
+  background: rgb(255 255 255 / 0.12);
+  border-radius: 9999px;
+}
+.p-galleria .p-galleria-item-nav {
+  background: rgb(255 255 255 / 0.12);
+  border-radius: 9999px;
+  width: 3rem;
+  height: 3rem;
+  margin: 0 1rem;
+}
+.p-galleria .p-galleria-close:hover,
+.p-galleria .p-galleria-item-nav:not(.p-disabled):hover {
+  background: rgb(255 255 255 / 0.25);
+  color: #fff;
+}
+
+/* ───────────── Accesibilidad ───────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

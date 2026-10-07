@@ -1,36 +1,40 @@
-import { Card } from "primereact/card";
+import { NEGOCIO, comoLlegarUrl } from "../Services/infoNegocio";
 
 const MapView = () => {
+  const { lat, lng } = NEGOCIO.coordenadas;
+
   return (
-    <Card className="w-full mx-auto my-6 shadow-lg">
-      <h2 className="text-xl font-semibold text-center py-4">
-        Nuestra Ubicación
-      </h2>
-      <div className="h-[400px] w-full">
+    <div className="card-soft overflow-hidden">
+      <div className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+        <div>
+          <p className="eyebrow mb-2">Ubicación</p>
+          <h2 className="heading-md">{NEGOCIO.direccion}</h2>
+          <p className="mt-1 text-sm text-ink-500">{NEGOCIO.ciudad}</p>
+        </div>
+        <a
+          href={comoLlegarUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-ghost self-start sm:self-auto"
+        >
+          <i className="pi pi-directions" />
+          Cómo llegar
+        </a>
+      </div>
+      <div className="h-[340px] w-full sm:h-[420px]">
         <iframe
           width="100%"
           height="100%"
-          style={{ border: 0 }}
-          src="https://www.google.com/maps?q=15.34375,-88.18811&hl=es&z=18&output=embed"
+          style={{ border: 0, filter: "grayscale(0.55) sepia(0.12) contrast(0.95)" }}
+          src={`https://www.google.com/maps?q=${lat},${lng}&hl=es&z=17&output=embed`}
           allowFullScreen
-          aria-hidden="false"
-          tabIndex="0"
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
           title="Mapa de ubicación"
         />
       </div>
-      <div className="text-center mt-4">
-        <a
-          href="https://www.google.com/maps?q=15.34375,-88.18811"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-purple-600 hover:underline font-medium"
-        >
-          Abrir en Google Maps
-        </a>
-      </div>
-    </Card>
+    </div>
   );
 };
 
 export default MapView;
-

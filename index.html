@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/logroprimario2.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Nail`s Art Suray</title>
+    <meta name="theme-color" content="#fbf7f4" />
+    <title>Nail's Art Suray · Uñas acrílicas en Quimistán</title>
 
     <meta
       name="description"
@@ -24,13 +25,17 @@
     />
     <meta property="og:url" content="https://nailsartsuray.vercel.app/" />
     <meta property="og:type" content="website" />
-  </head>
-  <body class="bg-white relative">
-    <div id="root"></div>
+    <meta property="og:locale" content="es_HN" />
 
-    <div
-      class="fixed inset-0 bg-[rgba(0,0,0,0.1)] pointer-events-none z-[9999]"
-    ></div>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     <script type="application/ld+json">
       {
@@ -39,11 +44,34 @@
         "name": "Nail's Art Suray",
         "image": "https://nailsartsuray.vercel.app/logroprimario2.png",
         "url": "https://nailsartsuray.vercel.app/",
+        "telephone": "+504 9336-7328",
         "address": {
           "@type": "PostalAddress",
-          "addressLocality": "Quimistan",
+          "streetAddress": "Residencial Green Valley",
+          "addressLocality": "Quimistán",
+          "addressRegion": "Santa Bárbara",
           "addressCountry": "HN"
         },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 15.34375,
+          "longitude": -88.18811
+        },
+        "openingHoursSpecification": [
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": [
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday"
+            ],
+            "opens": "08:00",
+            "closes": "19:00"
+          }
+        ],
         "description": "Servicios profesionales de uñas, decoración y cuidado personal. Reserva ya tu cita.",
         "priceRange": "$$"
       }
