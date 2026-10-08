@@ -9,6 +9,7 @@ import { InputMask } from "primereact/inputmask";
 import { Dropdown } from "primereact/dropdown";
 import { generarHoras } from "../Services/Funciones";
 import { whatsappUrl } from "../Services/infoNegocio";
+import { fechaDesdeISO, formatearFechaLarga } from "../Services/promociones";
 
 const FORM_INICIAL = {
   nombre: "",
@@ -69,7 +70,9 @@ const esFechaHoraPasada = (fecha, hora) =>
 
 // Diálogo de reserva. Se carga bajo demanda desde BotonReservaCita para que
 // el calendario, los dropdowns y SweetAlert no pesen en la carga inicial.
-const ReservaDialog = ({ visible, onClose }) => {
+// Con `promocion`, la cita se guarda con esa promoción y solo se puede
+// agendar hasta su fecha de vencimiento.
+const ReservaDialog = ({ visible, onClose, promocion = null }) => {
   const [loading, setLoading] = useState(false);
   const [servicios, setServicios] = useState([]);
   const [formData, setFormData] = useState(FORM_INICIAL);
@@ -88,6 +91,20 @@ const ReservaDialog = ({ visible, onClose }) => {
   useEffect(() => {
     if (visible && servicios.length === 0) getServicios();
   }, [visible, servicios.length]);
+
+  // Con promoción solo se ofrecen sus servicios; si es uno, queda elegido
+  const serviciosPromo = promocion?.servicios ?? [];
+  const servicioFijo = serviciosPromo.length === 1 ? serviciosPromo[0].id : null;
+  const opcionesServicio = serviciosPromo.length
+    ? serviciosPromo.map((sp) => servicios.find((s) => s.id === sp.id) ?? sp)
+    : servicios;
+  const fechaMaxima = promocion ? fechaDesdeISO(promocion.fecha_fin) : null;
+
+  useEffect(() => {
+    if (visible && servicioFijo) {
+      setFormData((prev) => ({ ...prev, iddetalleservicio: servicioFijo }));
+    }
+  }, [visible, servicioFijo]);
 
   const setCampo = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -122,6 +139,9 @@ const ReservaDialog = ({ visible, onClose }) => {
     if (fecha && hora && esFechaHoraPasada(fecha, hora)) {
       newErrors.hora = "Esa hora ya pasó, elige otra";
     }
+    if (fecha && fechaMaxima && fecha > fechaMaxima) {
+      newErrors.fecha = "La promoción es válida hasta el " + formatearFechaLarga(promocion.fecha_fin);
+    }
 
     setErrors(newErrors);
 
@@ -138,12 +158,20 @@ const ReservaDialog = ({ visible, onClose }) => {
         hora,
         iddetalleservicio: formData.iddetalleservicio,
         idestado: 3,
+        ...(promocion && { idpromocion: promocion.id }),
       },
     ]);
 
     setLoading(false);
 
-    if (error) {
+    if (error?.message?.includes("PROMOCION_NO_DISPONIBLE")) {
+      Swal.fire({
+        icon: "info",
+        title: "Promoción no disponible",
+        text: "Esta promoción ya terminó o no aplica para ese día. Puedes reservar tu cita sin la promoción.",
+        confirmButtonColor: "#9c5a64",
+      });
+    } else if (error) {
       Swal.fire({
         icon: "error",
         title: "Algo salió mal",
@@ -171,7 +199,7 @@ const ReservaDialog = ({ visible, onClose }) => {
 
   const header = (
     <div>
-      <p className="eyebrow mb-2">Nail's Art Suray</p>
+      <p className="eyebrow mb-2">{promocion ? "Promoción" : "Nail's Art Suray"}</p>
       <h2 className="font-display text-3xl font-medium text-ink-900">
         Reserva tu cita
       </h2>
@@ -193,6 +221,27 @@ const ReservaDialog = ({ visible, onClose }) => {
         dismissableMask
       >
         <form onSubmit={handleSubmit} className="space-y-4 pt-2" noValidate>
+          {promocion && (
+            <div className="flex items-start gap-3 rounded-2xl bg-brand-50 p-4 ring-1 ring-brand-200">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white">
+                <i className="pi pi-tag text-sm" />
+              </span>
+              <div className="min-w-0 text-sm">
+                <p className="font-medium text-ink-900">
+                  {promocion.titulo}
+                  {promocion.etiqueta && (
+                    <span className="ml-2 rounded-full bg-white px-2 py-0.5 text-xs font-semibold text-brand-700 ring-1 ring-brand-200">
+                      {promocion.etiqueta}
+                    </span>
+                  )}
+                </p>
+                <p className="mt-0.5 text-xs text-ink-500">
+                  Válida para citas hasta el {formatearFechaLarga(promocion.fecha_fin)}.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* NOMBRE */}
           <div>
             <label htmlFor="nombre" className="field-label">
@@ -237,12 +286,15 @@ const ReservaDialog = ({ visible, onClose }) => {
               inputId="servicio"
               name="iddetalleservicio"
               value={formData.iddetalleservicio}
-              options={servicios}
+              options={opcionesServicio}
               onChange={(e) => setCampo("iddetalleservicio", e.value)}
               optionLabel="nombre"
               optionValue="id"
-              placeholder="Selecciona un servicio"
+              placeholder={
+                servicioFijo ? serviciosPromo[0].nombre : "Selecciona un servicio"
+              }
               emptyMessage="Cargando servicios…"
+              disabled={!!servicioFijo}
               className="w-full"
               invalid={errors.iddetalleservicio}
             />
@@ -268,11 +320,16 @@ const ReservaDialog = ({ visible, onClose }) => {
                 placeholder="Elige un día"
                 locale="es"
                 minDate={calcularFechaMinima()}
+                maxDate={fechaMaxima ?? undefined}
                 disabledDays={[0]}
                 readOnlyInput
-                invalid={errors.fecha}
+                invalid={!!errors.fecha}
               />
-              {errors.fecha && <p className="field-error">Campo requerido</p>}
+              {errors.fecha && (
+                <p className="field-error">
+                  {typeof errors.fecha === "string" ? errors.fecha : "Campo requerido"}
+                </p>
+              )}
             </div>
 
             {/* HORA */}

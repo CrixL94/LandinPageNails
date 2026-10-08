@@ -4,6 +4,7 @@ import Navbar from "../Components/NavBar"
 import Footer from "../Components/Footer";
 import WhatsAppFab from "../Components/WhatsAppFab";
 import PageLoader from "../Components/PageLoader";
+import Promociones from "../Components/Promociones";
 
 const Layout = () => {
   return (
@@ -19,6 +20,7 @@ const Layout = () => {
 
       <Footer/>
       <WhatsAppFab />
+      <Promociones />
     </div>
   );
 };
